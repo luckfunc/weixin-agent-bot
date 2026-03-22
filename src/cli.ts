@@ -3,9 +3,9 @@ import 'dotenv/config'
 import { createRequire } from 'node:module'
 import { log as clackLog, intro, outro } from '@clack/prompts'
 import chalk from 'chalk'
-import type { ResolvedProvider } from '@/types/index.js'
-import { promptProvider, resolveProviderFromEnv } from './auth/prompt.js'
-import { runWeixinBot } from './bot/weixin-runner.js'
+import type { LlmRuntime } from '@/types/index.js'
+import { promptLlmRuntime, tryResolveLlmRuntime } from './llm/index.js'
+import { runWeixinBot } from './wechat/bot.js'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json') as { version: string }
@@ -16,22 +16,28 @@ if (args.has('--help') || args.has('-h')) {
   console.log(`
   ${chalk.bold('weixin-agent-bot')} v${pkg.version}
 
-  Connect any LLM to WeChat in minutes.
+  WeChat + GPT (OpenAI API key or ChatGPT / Codex browser login).
 
   ${chalk.dim('Usage')}
     $ weixin-agent-bot [options]
 
   ${chalk.dim('Options')}
     --force-login   Force WeChat QR re-login (skip cached session)
-    --reauth        Re-select and re-authenticate LLM provider
+    --reauth        Re-sign-in (pick API key vs browser OAuth again)
     --help, -h      Show this message
     --version, -v   Show version
 
   ${chalk.dim('Environment')}
-    PROVIDER           Force a provider (openai, anthropic, gemini, moonshot, ...)
-    OPENAI_API_KEY     OpenAI key  (or any <PROVIDER>_API_KEY)
-    MODEL              Override model for any provider
-    SYSTEM_PROMPT      Custom system prompt
+    PROVIDER           openai | codex (optional; disambiguate when both are configured)
+    OPENAI_API_KEY     OpenAI platform API key (sk-...)
+    OPENAI_BASE_URL    Optional API base URL
+    OPENAI_MODEL       Model id for API path
+    CODEX_MODEL        Model id for Codex path
+    MODEL              Fallback if *_MODEL unset (Codex: default gpt-5.2; API: gpt-4o-mini)
+    SYSTEM_PROMPT      System message for the assistant
+    CHAT_MAX_MESSAGES  Max user+assistant messages per WeChat user (default 50)
+    CODEX_AUTH_PATH    Override path for Codex OAuth token file
+    NO_OPEN_BROWSER=1  Do not open OAuth URL automatically
 `)
   process.exit(0)
 }
@@ -44,24 +50,42 @@ if (args.has('--version') || args.has('-v')) {
 const forceLogin = args.has('--force-login')
 const reauth = args.has('--reauth')
 
+function logResolvedLlm(llm: LlmRuntime): void {
+  if (llm.kind === 'codex') {
+    clackLog.info(
+      `Codex / ${chalk.dim(llm.model)} ${chalk.dim('(env, saved, or token file)')}`,
+    )
+    return
+  }
+  clackLog.info(
+    `OpenAI API / ${chalk.dim(llm.config.model)} ${chalk.dim('(env or saved)')}`,
+  )
+}
+
+function outroLlm(llm: LlmRuntime): string {
+  if (llm.kind === 'codex') return `Codex / ${llm.model}`
+  return `OpenAI API / ${llm.config.model}`
+}
+
 async function main(): Promise<void> {
   intro(chalk.bgCyan(chalk.black(` weixin-agent-bot v${pkg.version} `)))
 
-  let provider: ResolvedProvider
-
-  const envProvider = resolveProviderFromEnv()
-  if (envProvider && !reauth) {
-    clackLog.info(
-      `Provider: ${chalk.cyan(envProvider.label)} / ${chalk.dim(envProvider.model)} ${chalk.dim('(env)')}`,
-    )
-    provider = envProvider
+  let llm: LlmRuntime
+  if (reauth) {
+    llm = await promptLlmRuntime({ forceReauth: true })
   } else {
-    provider = await promptProvider({ forceReauth: reauth })
+    const resolved = tryResolveLlmRuntime()
+    if (resolved) {
+      logResolvedLlm(resolved)
+      llm = resolved
+    } else {
+      llm = await promptLlmRuntime()
+    }
   }
 
-  outro(chalk.dim(`Provider: ${provider.label} / ${provider.model}`))
+  outro(chalk.dim(outroLlm(llm)))
 
-  await runWeixinBot({ provider, forceLogin })
+  await runWeixinBot({ llm, forceLogin })
 }
 
 main().catch((err) => {

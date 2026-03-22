@@ -1,6 +1,6 @@
 import { isCancel, text } from '@clack/prompts'
 import { loginOpenAICodex } from '@mariozechner/pi-ai/oauth'
-import { openUrlInBrowser } from '../../lib/open-url.js'
+import { openUrlInBrowser } from './open-url.js'
 import { codexAuthPath, loadCodexAuth, saveCodexAuth } from './store.js'
 
 export async function ensureCodexAuth(
@@ -10,7 +10,7 @@ export async function ensureCodexAuth(
     console.log(
       `[Codex] Credentials found, skipping browser login (${codexAuthPath()})`,
     )
-    console.log('[Codex] To sign in again, run the CLI with --reauth.\n')
+    console.log('[Codex] To sign in again, run with --reauth.\n')
     return
   }
 
@@ -19,8 +19,7 @@ export async function ensureCodexAuth(
       openUrlInBrowser(url)
       console.log(
         'Opening the auth page in your browser (or open this URL manually):\n' +
-          url +
-          '\n',
+          `${url}\n`,
       )
       if (instructions) console.log(instructions)
     },
@@ -29,14 +28,12 @@ export async function ensureCodexAuth(
         message: prompt.message,
         placeholder: prompt.placeholder,
       })
-      if (isCancel(answer)) {
-        throw new Error('OAuth cancelled')
-      }
+      if (isCancel(answer)) throw new Error('Codex login cancelled')
       return answer
     },
-    onProgress: (message) => console.log('[OAuth]', message),
   })
 
-  saveCodexAuth({ 'openai-codex': { type: 'oauth', ...credentials } })
-  console.log(`\n[Codex] Credentials saved: ${codexAuthPath()}\n`)
+  saveCodexAuth({
+    'openai-codex': { type: 'oauth', ...credentials },
+  })
 }

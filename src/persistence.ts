@@ -2,9 +2,7 @@ import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
 import type { AuthProfile, AuthStore } from '@/types/index.js'
-import { writeSecretJson } from '../lib/secret-file.js'
-
-export type { AuthProfile, AuthStore } from '@/types/index.js'
+import { writeSecretJson } from './lib/secret-file.js'
 
 const defaultDir = path.join(homedir(), '.weixin-agent-bot')
 const defaultPath = path.join(defaultDir, 'auth.json')
@@ -34,12 +32,9 @@ export function getActiveProfile(): AuthProfile | undefined {
   return store.profiles[store.activeProvider]
 }
 
-export function setActiveProvider(
-  providerId: string,
-  profile: AuthProfile,
-): void {
+export function setActiveAuth(profile: AuthProfile): void {
   const store = loadAuthStore()
-  store.activeProvider = providerId
-  store.profiles[providerId] = profile
+  store.activeProvider = profile.provider
+  store.profiles[profile.provider] = profile
   saveAuthStore(store)
 }

@@ -3,7 +3,7 @@ import { type IncomingMessage, WeixinBot } from '@pinixai/weixin-bot'
 import chalk from 'chalk'
 import qrterm from 'qrcode-terminal'
 import type { WeixinBotOptions } from '@/types/index.js'
-import { replyText } from '../llm/reply.js'
+import { replyWithCodexChat, replyWithOpenAiChat } from '../llm/index.js'
 
 export type { WeixinBotOptions } from '@/types/index.js'
 
@@ -12,13 +12,12 @@ function ts(level: string, msg: string) {
 }
 
 export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
-  const { provider, forceLogin } = opts
+  const { llm, forceLogin } = opts
   const systemPrompt =
     process.env.SYSTEM_PROMPT ??
     'You are a helpful assistant. Reply concisely in the same language as the user.'
   const tokenPath = process.env.WEIXIN_TOKEN_PATH
 
-  // --- Login with spinner & inline QR ---
   const loginSpinner = spinner()
   loginSpinner.start(
     forceLogin ? 'Generating WeChat QR code...' : 'Connecting to WeChat...',
@@ -78,7 +77,9 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
     stopLoginSpinner(`WeChat connected — ${chalk.dim(creds.accountId)}`)
   }
 
-  // --- Message handler ---
+  const backendLabel = llm.kind === 'codex' ? 'Codex' : 'OpenAI API'
+  const modelLabel = llm.kind === 'codex' ? llm.model : llm.config.model
+
   bot.onMessage(async (msg: IncomingMessage) => {
     if (msg.type !== 'text' || !msg.text?.trim()) return
 
@@ -93,10 +94,18 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
     }
 
     try {
-      const text = await replyText(provider, {
-        systemPrompt,
-        userText: msg.text,
-      })
+      const text =
+        llm.kind === 'codex'
+          ? await replyWithCodexChat(llm.model, {
+              conversationId: msg.userId,
+              systemPrompt,
+              userText: msg.text,
+            })
+          : await replyWithOpenAiChat(llm.config, {
+              conversationId: msg.userId,
+              systemPrompt,
+              userText: msg.text,
+            })
       if (!text) {
         await bot.reply(msg, '(no model output)')
         return
@@ -123,7 +132,7 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
   })
 
   clackLog.info(
-    `${chalk.cyan(provider.label)} / ${chalk.dim(provider.model)} — listening for messages ${chalk.dim('(Ctrl+C to stop)')}`,
+    `${chalk.cyan(backendLabel)} / ${chalk.dim(modelLabel)} — listening for messages ${chalk.dim('(Ctrl+C to stop)')}`,
   )
 
   await bot.run()

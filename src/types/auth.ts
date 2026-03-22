@@ -1,10 +1,18 @@
-/** Persisted active provider + keys (see auth/store). */
-export interface AuthProfile {
-  provider: string
+/** Persisted OpenAI API credentials (see persistence/auth-store). */
+export interface OpenAiAuthProfile {
+  provider: 'openai'
   apiKey?: string
   baseUrl?: string
   model?: string
 }
+
+/** Last-selected Codex model; OAuth tokens live in codex-auth.json. */
+export interface CodexAuthProfile {
+  provider: 'codex'
+  model?: string
+}
+
+export type AuthProfile = OpenAiAuthProfile | CodexAuthProfile
 
 export interface AuthStore {
   version: number
@@ -12,7 +20,7 @@ export interface AuthStore {
   profiles: Record<string, AuthProfile>
 }
 
-/** Matches @mariozechner/pi-ai/oauth getOAuthApiKey shape. */
+/** Shape stored in `codex-auth.json` for @mariozechner/pi-ai OAuth. */
 export interface CodexAuthFile {
   'openai-codex': {
     type: 'oauth'

@@ -1,13 +1,13 @@
 import OpenAI from 'openai'
-import type { FetchModelsOptions } from '@/types/index.js'
-
-export type { FetchModelsOptions } from '@/types/index.js'
+import type { FetchModelsOptions } from './types.js'
 
 /**
- * Fetch available model IDs from an OpenAI-compatible /v1/models endpoint.
- * Returns an empty array on failure (caller should fall back to manual input).
+ * Lists model IDs from an OpenAI-compatible `GET /v1/models`.
+ * Returns [] on failure (caller falls back to manual input).
  */
-export async function fetchModels(opts: FetchModelsOptions): Promise<string[]> {
+export async function fetchOpenAiModelIds(
+  opts: FetchModelsOptions,
+): Promise<string[]> {
   try {
     const client = new OpenAI({
       apiKey: opts.apiKey,

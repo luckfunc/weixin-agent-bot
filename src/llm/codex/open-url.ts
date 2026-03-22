@@ -10,8 +10,6 @@ export function openUrlInBrowser(url: string): void {
     if (platform === 'darwin') {
       spawn('open', [url], { detached: true, stdio: 'ignore' }).unref()
     } else if (platform === 'win32') {
-      // Avoid `cmd /c start` — `&` in query strings is treated as a command
-      // separator, truncating OAuth URLs and causing auth failures in the browser.
       spawn('rundll32', ['url.dll,FileProtocolHandler', url], {
         detached: true,
         stdio: 'ignore',
