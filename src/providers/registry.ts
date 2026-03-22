@@ -106,6 +106,16 @@ const providers: ProviderDef[] = [
     models: ['deepseek-chat', 'deepseek-reasoner'],
   },
   {
+    id: 'moonshot',
+    label: 'Kimi (Moonshot)',
+    hint: 'Moonshot API (OpenAI-compatible)',
+    authKind: 'api_key',
+    envKeys: ['MOONSHOT_API_KEY'],
+    baseUrl: 'https://api.moonshot.cn/v1/',
+    defaultModel: 'moonshot-v1-8k',
+    models: ['moonshot-v1-8k', 'moonshot-v1-32k', 'moonshot-v1-128k'],
+  },
+  {
     id: 'groq',
     label: 'Groq',
     hint: 'Fast inference: Llama, Mixtral',

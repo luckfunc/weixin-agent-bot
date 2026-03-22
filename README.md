@@ -2,7 +2,7 @@
 
 [English](README.en.md)
 
-微信 **iLink** + **大模型** 命令行工具：可选 **OpenAI API** 或 **ChatGPT / Codex（OAuth）**，扫码绑定微信后，用所选模型自动回复消息。
+微信 **iLink** + **大模型** 命令行工具：可选 **OpenAI**、**DeepSeek**、**Kimi (Moonshot)**、**ChatGPT / Codex（OAuth）** 等，扫码绑定微信后，用所选模型自动回复消息。
 
 **无需部署 OpenClaw：** 本项目是普通的 **Node 命令行**，在你本机或任意有 Node 的环境即可运行，**不必**单独搭建、托管微信 **OpenClaw** 智能体运行时；装好依赖、扫码登录，再按提示或 `.env` 配置 Codex、OpenAI 等即可。
 
@@ -13,8 +13,8 @@
 需要 **Node.js ≥ 22**。
 
 ```bash
-# 无需克隆仓库，直接跑最新已发布版本（首次运行会下载）
-npx weixin-agent-bot@latest
+# 无需克隆仓库，直接跑最新已发布版本（首次运行会下载；-y 表示无需确认安装）
+npx -y weixin-agent-bot@latest
 ```
 
 按终端提示操作即可。可选：在当前目录创建 `.env`（参考仓库里的 `.env.example`），以便跳过部分交互——可从 [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example) 复制。

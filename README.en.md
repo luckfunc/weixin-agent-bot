@@ -13,8 +13,8 @@ WeChat **iLink** + **LLM** CLI: pick **OpenAI API** or **ChatGPT / Codex (OAuth)
 Requires **Node.js ≥ 22**.
 
 ```bash
-# Run the latest release without cloning (downloads on first run)
-npx weixin-agent-bot@latest
+# Run the latest release without cloning (downloads on first run; -y skips install prompt)
+npx -y weixin-agent-bot@latest
 ```
 
 Then follow the prompts. Optional: create a `.env` in the current directory (see `.env.example` in the repo) so the CLI can skip questions — copy from [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example).

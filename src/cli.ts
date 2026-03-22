@@ -28,7 +28,7 @@ if (args.has('--help') || args.has('-h')) {
     --version, -v   Show version
 
   ${chalk.dim('Environment')}
-    PROVIDER           Force a provider (openai, anthropic, gemini, ...)
+    PROVIDER           Force a provider (openai, anthropic, gemini, moonshot, ...)
     OPENAI_API_KEY     OpenAI key  (or any <PROVIDER>_API_KEY)
     MODEL              Override model for any provider
     SYSTEM_PROMPT      Custom system prompt
