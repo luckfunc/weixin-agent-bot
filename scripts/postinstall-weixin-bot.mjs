@@ -2,21 +2,38 @@
 /**
  * @pinixai/weixin-bot publishes TypeScript sources without prebuilt dist/.
  * Build it once after install so `exports` → dist/index.js resolves.
+ *
+ * Resolves the install path by walking up from this package root — npm often hoists
+ * @pinixai/weixin-bot to a sibling node_modules, so a fixed relative path is wrong.
  */
 import { existsSync } from 'node:fs'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 
-const root = path.join(fileURLToPath(new URL('.', import.meta.url)), '..')
-const pkgDir = path.join(root, 'node_modules', '@pinixai', 'weixin-bot')
-const distIndex = path.join(pkgDir, 'dist', 'index.js')
+const packageRoot = path.join(fileURLToPath(new URL('.', import.meta.url)), '..')
 
-if (!existsSync(path.join(pkgDir, 'package.json'))) {
+function findHoistedPackageDir(startDir, scope, pkgName) {
+  let dir = path.resolve(startDir)
+  for (let i = 0; i < 12; i++) {
+    const candidate = path.join(dir, 'node_modules', scope, pkgName, 'package.json')
+    if (existsSync(candidate)) {
+      return path.dirname(candidate)
+    }
+    const parent = path.dirname(dir)
+    if (parent === dir) break
+    dir = parent
+  }
+  return undefined
+}
+
+const pkgDir = findHoistedPackageDir(packageRoot, '@pinixai', 'weixin-bot')
+if (!pkgDir) {
   console.warn('[postinstall] @pinixai/weixin-bot not found, skip build')
   process.exit(0)
 }
 
+const distIndex = path.join(pkgDir, 'dist', 'index.js')
 if (existsSync(distIndex)) {
   process.exit(0)
 }
