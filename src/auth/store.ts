@@ -34,7 +34,10 @@ export function getActiveProfile(): AuthProfile | undefined {
   return store.profiles[store.activeProvider]
 }
 
-export function setActiveProvider(providerId: string, profile: AuthProfile): void {
+export function setActiveProvider(
+  providerId: string,
+  profile: AuthProfile,
+): void {
   const store = loadAuthStore()
   store.activeProvider = providerId
   store.profiles[providerId] = profile

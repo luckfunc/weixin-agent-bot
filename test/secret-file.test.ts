@@ -9,7 +9,9 @@ import { withEnv } from './helpers.js'
 
 const skipOnWindows = process.platform === 'win32'
 
-test('auth store writes provider secrets with private permissions', { skip: skipOnWindows }, async () => {
+test('auth store writes provider secrets with private permissions', {
+  skip: skipOnWindows,
+}, async () => {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'wab-auth-store-'))
   const authPath = path.join(tempDir, 'secret', 'auth.json')
 
@@ -30,7 +32,9 @@ test('auth store writes provider secrets with private permissions', { skip: skip
   }
 })
 
-test('codex auth store writes oauth secrets with private permissions', { skip: skipOnWindows }, async () => {
+test('codex auth store writes oauth secrets with private permissions', {
+  skip: skipOnWindows,
+}, async () => {
   const tempDir = mkdtempSync(path.join(os.tmpdir(), 'wab-codex-store-'))
   const authPath = path.join(tempDir, 'secret', 'codex.json')
 

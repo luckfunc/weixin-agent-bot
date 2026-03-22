@@ -1,11 +1,27 @@
+import {
+  cancel,
+  isCancel,
+  log,
+  note,
+  select,
+  spinner,
+  text,
+} from '@clack/prompts'
 import chalk from 'chalk'
-import { cancel, isCancel, log, note, select, spinner, text } from '@clack/prompts'
-import { getAllProviders, getProvider } from '../providers/registry.js'
+import type {
+  PromptModelAuth,
+  ProviderDef,
+  ResolvedProvider,
+} from '@/types/index.js'
 import { fetchModels } from '../providers/fetch-models.js'
-import type { PromptModelAuth, ProviderDef, ResolvedProvider } from '@/types/index.js'
-import { getActiveProfile, setActiveProvider, type AuthProfile } from './store.js'
+import { getAllProviders, getProvider } from '../providers/registry.js'
 import { ensureCodexAuth } from './codex/oauth-flow.js'
 import { loadCodexAuth } from './codex/store.js'
+import {
+  type AuthProfile,
+  getActiveProfile,
+  setActiveProvider,
+} from './store.js'
 
 /**
  * Resolve provider for non-interactive runs.
@@ -32,12 +48,19 @@ function providerModelEnvKey(def: ProviderDef): string {
 }
 
 function modelFromEnv(def: ProviderDef): string | undefined {
-  return process.env[providerModelEnvKey(def)]?.trim() ?? process.env.MODEL?.trim()
+  return (
+    process.env[providerModelEnvKey(def)]?.trim() ?? process.env.MODEL?.trim()
+  )
 }
 
-function resolveExplicitProvider(def: ProviderDef): ResolvedProvider | undefined {
+function resolveExplicitProvider(
+  def: ProviderDef,
+): ResolvedProvider | undefined {
   if (def.authKind === 'none') {
-    const baseUrl = def.id === 'ollama' ? process.env.OLLAMA_BASE_URL?.trim() ?? def.baseUrl : def.baseUrl
+    const baseUrl =
+      def.id === 'ollama'
+        ? (process.env.OLLAMA_BASE_URL?.trim() ?? def.baseUrl)
+        : def.baseUrl
     return {
       id: def.id,
       label: def.label,
@@ -58,7 +81,9 @@ function resolveExplicitProvider(def: ProviderDef): ResolvedProvider | undefined
   return resolveApiKeyProviderFromEnv(def)
 }
 
-function resolveApiKeyProviderFromEnv(def: ProviderDef): ResolvedProvider | undefined {
+function resolveApiKeyProviderFromEnv(
+  def: ProviderDef,
+): ResolvedProvider | undefined {
   if (def.authKind !== 'api_key') return undefined
 
   let baseUrl = def.baseUrl
@@ -82,7 +107,9 @@ function resolveApiKeyProviderFromEnv(def: ProviderDef): ResolvedProvider | unde
   return undefined
 }
 
-function resolveFromSavedProfile(profile: AuthProfile): ResolvedProvider | undefined {
+function resolveFromSavedProfile(
+  profile: AuthProfile,
+): ResolvedProvider | undefined {
   const def = getProvider(profile.provider)
   if (!def) return undefined
   if (def.id === 'codex' && !loadCodexAuth()) return undefined
@@ -103,7 +130,9 @@ function resolveFromSavedProfile(profile: AuthProfile): ResolvedProvider | undef
  * reused without re-authentication. When `forceReauth` is set, auth runs even
  * for the saved provider.
  */
-export async function promptProvider(opts?: { forceReauth?: boolean }): Promise<ResolvedProvider> {
+export async function promptProvider(opts?: {
+  forceReauth?: boolean
+}): Promise<ResolvedProvider> {
   const saved = getActiveProfile()
   const forceReauth = opts?.forceReauth ?? false
 
@@ -113,7 +142,9 @@ export async function promptProvider(opts?: { forceReauth?: boolean }): Promise<
     const isCurrent = saved?.provider === p.id
     return {
       value: p.id,
-      label: isCurrent ? `${p.label} ${chalk.dim(`(${saved!.model ?? p.defaultModel})`)}` : p.label,
+      label: isCurrent
+        ? `${p.label} ${chalk.dim(`(${saved?.model ?? p.defaultModel})`)}`
+        : p.label,
       hint: isCurrent ? 'current' : p.hint,
     }
   })
@@ -129,12 +160,17 @@ export async function promptProvider(opts?: { forceReauth?: boolean }): Promise<
     process.exit(0)
   }
 
-  const def = getProvider(providerId)!
+  const def = getProvider(providerId)
+  if (!def) {
+    throw new Error(`Unknown provider: ${providerId}`)
+  }
 
   if (!forceReauth && saved?.provider === providerId) {
     const resolved = resolveFromSavedProfile(saved)
     if (resolved) {
-      log.success(`${chalk.cyan(resolved.label)} / ${chalk.dim(resolved.model)}`)
+      log.success(
+        `${chalk.cyan(resolved.label)} / ${chalk.dim(resolved.model)}`,
+      )
       return resolved
     }
   }
@@ -156,16 +192,27 @@ async function handleNoAuth(def: ProviderDef): Promise<ResolvedProvider> {
   if (def.id === 'ollama') {
     const ollamaUrl = process.env.OLLAMA_BASE_URL?.trim()
     if (ollamaUrl) baseUrl = ollamaUrl
-    note(chalk.dim(`Endpoint: ${baseUrl}\nNo authentication required.`), chalk.green(def.label))
+    note(
+      chalk.dim(`Endpoint: ${baseUrl}\nNo authentication required.`),
+      chalk.green(def.label),
+    )
   }
 
   const model = await promptModel(def, { apiKey: 'no-key', baseUrl })
-  const resolved: ResolvedProvider = { id: def.id, label: def.label, baseUrl, model }
+  const resolved: ResolvedProvider = {
+    id: def.id,
+    label: def.label,
+    baseUrl,
+    model,
+  }
   setActiveProvider(def.id, { provider: def.id, baseUrl, model })
   return resolved
 }
 
-async function handleOAuth(def: ProviderDef, opts: { forceReauth?: boolean }): Promise<ResolvedProvider> {
+async function handleOAuth(
+  def: ProviderDef,
+  opts: { forceReauth?: boolean },
+): Promise<ResolvedProvider> {
   if (def.id === 'codex') {
     const forceReauth = opts.forceReauth ?? false
     const hasAuth = loadCodexAuth()
@@ -208,7 +255,8 @@ async function handleApiKey(def: ProviderDef): Promise<ResolvedProvider> {
     const answer = await text({
       message: `Enter API key for ${def.label}`,
       placeholder: `${envHint}=sk-...`,
-      validate: (v) => (v.trim().length === 0 ? 'Key cannot be empty' : undefined),
+      validate: (v) =>
+        v.trim().length === 0 ? 'Key cannot be empty' : undefined,
     })
 
     if (isCancel(answer)) {
@@ -221,7 +269,8 @@ async function handleApiKey(def: ProviderDef): Promise<ResolvedProvider> {
 
   let baseUrl = def.baseUrl
   if (def.id === 'openai-compat') {
-    const existingUrl = process.env.OPENAI_COMPAT_BASE_URL?.trim() ?? saved?.baseUrl
+    const existingUrl =
+      process.env.OPENAI_COMPAT_BASE_URL?.trim() ?? saved?.baseUrl
     if (existingUrl) {
       baseUrl = existingUrl
       note(chalk.dim(`Endpoint: ${baseUrl}`), chalk.green(def.label))
@@ -229,7 +278,8 @@ async function handleApiKey(def: ProviderDef): Promise<ResolvedProvider> {
       const urlAnswer = await text({
         message: `Enter base URL for ${def.label}`,
         placeholder: 'http://localhost:8000/v1/',
-        validate: (v) => (v.trim().length === 0 ? 'URL cannot be empty' : undefined),
+        validate: (v) =>
+          v.trim().length === 0 ? 'URL cannot be empty' : undefined,
       })
       if (isCancel(urlAnswer)) {
         cancel('Cancelled')
@@ -244,7 +294,10 @@ async function handleApiKey(def: ProviderDef): Promise<ResolvedProvider> {
   return { id: def.id, label: def.label, apiKey, baseUrl, model }
 }
 
-async function promptModel(def: ProviderDef, auth: PromptModelAuth): Promise<string> {
+async function promptModel(
+  def: ProviderDef,
+  auth: PromptModelAuth,
+): Promise<string> {
   const envModel = modelFromEnv(def)
   if (envModel) {
     log.info(`Model: ${chalk.cyan(envModel)} ${chalk.dim('(env)')}`)
@@ -258,7 +311,11 @@ async function promptModel(def: ProviderDef, auth: PromptModelAuth): Promise<str
     const s = spinner()
     s.start('Fetching available models...')
     fetched = await fetchModels({ apiKey: auth.apiKey, baseUrl: auth.baseUrl })
-    s.stop(fetched.length > 0 ? `Found ${fetched.length} models` : 'Using default model list')
+    s.stop(
+      fetched.length > 0
+        ? `Found ${fetched.length} models`
+        : 'Using default model list',
+    )
   }
 
   const curatedSet = new Set(curated)
@@ -278,7 +335,9 @@ async function promptModel(def: ProviderDef, auth: PromptModelAuth): Promise<str
 
     const choice = await select({
       message: 'Select a model',
-      initialValue: all.includes(def.defaultModel) ? def.defaultModel : undefined,
+      initialValue: all.includes(def.defaultModel)
+        ? def.defaultModel
+        : undefined,
       options,
     })
 

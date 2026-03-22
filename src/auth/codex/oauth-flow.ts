@@ -1,11 +1,15 @@
 import { isCancel, text } from '@clack/prompts'
 import { loginOpenAICodex } from '@mariozechner/pi-ai/oauth'
-import { codexAuthPath, loadCodexAuth, saveCodexAuth } from './store.js'
 import { openUrlInBrowser } from '../../lib/open-url.js'
+import { codexAuthPath, loadCodexAuth, saveCodexAuth } from './store.js'
 
-export async function ensureCodexAuth(options: { force?: boolean } = {}): Promise<void> {
+export async function ensureCodexAuth(
+  options: { force?: boolean } = {},
+): Promise<void> {
   if (!options.force && loadCodexAuth()) {
-    console.log(`[Codex] Credentials found, skipping browser login (${codexAuthPath()})`)
+    console.log(
+      `[Codex] Credentials found, skipping browser login (${codexAuthPath()})`,
+    )
     console.log('[Codex] To sign in again, run the CLI with --reauth.\n')
     return
   }
@@ -13,7 +17,11 @@ export async function ensureCodexAuth(options: { force?: boolean } = {}): Promis
   const credentials = await loginOpenAICodex({
     onAuth: ({ url, instructions }) => {
       openUrlInBrowser(url)
-      console.log('Opening the auth page in your browser (or open this URL manually):\n' + url + '\n')
+      console.log(
+        'Opening the auth page in your browser (or open this URL manually):\n' +
+          url +
+          '\n',
+      )
       if (instructions) console.log(instructions)
     },
     onPrompt: async (prompt) => {

@@ -11,6 +11,7 @@
 - `npm run build` runs `tsc` to emit `dist/cli.js`, matching the published `weixin-agent-bot` binary.
 - `npm run test` executes `tsx --test test/**/*.test.ts`, covering provider-env, secret-file, and serial-task flows without separate compilation.
 - `npm run lint` runs `tsc --noEmit` as a strict type check and should precede merges.
+- `npm run check:biome` runs **Biome** (format + lint + import organization); `npm run format` applies safe fixes. Config: `biome.json` (initialized with `@biomejs/biome init`; the separate `create-biome` CLI is interactive-only—use it from a real terminal if you prefer that wizard).
 - `npm run postinstall` builds `@pinixai/weixin-bot` from `scripts/postinstall-weixin-bot.mjs`; rerun only when SDK or environment changes require it.
 
 ## Coding Style & Naming Conventions

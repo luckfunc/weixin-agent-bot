@@ -1,9 +1,9 @@
-import { WeixinBot, type IncomingMessage } from '@pinixai/weixin-bot'
-import qrterm from 'qrcode-terminal'
+import { log as clackLog, spinner } from '@clack/prompts'
+import { type IncomingMessage, WeixinBot } from '@pinixai/weixin-bot'
 import chalk from 'chalk'
-import { spinner, log as clackLog } from '@clack/prompts'
-import { replyText } from '../llm/reply.js'
+import qrterm from 'qrcode-terminal'
 import type { WeixinBotOptions } from '@/types/index.js'
+import { replyText } from '../llm/reply.js'
 
 export type { WeixinBotOptions } from '@/types/index.js'
 
@@ -14,12 +14,15 @@ function ts(level: string, msg: string) {
 export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
   const { provider, forceLogin } = opts
   const systemPrompt =
-    process.env.SYSTEM_PROMPT ?? 'You are a helpful assistant. Reply concisely in the same language as the user.'
+    process.env.SYSTEM_PROMPT ??
+    'You are a helpful assistant. Reply concisely in the same language as the user.'
   const tokenPath = process.env.WEIXIN_TOKEN_PATH
 
   // --- Login with spinner & inline QR ---
   const loginSpinner = spinner()
-  loginSpinner.start(forceLogin ? 'Generating WeChat QR code...' : 'Connecting to WeChat...')
+  loginSpinner.start(
+    forceLogin ? 'Generating WeChat QR code...' : 'Connecting to WeChat...',
+  )
   let loginSpinnerStopped = false
 
   function stopLoginSpinner(message: string): void {
@@ -48,7 +51,10 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
   const bot = new WeixinBot({
     tokenPath,
     onError: (err: unknown) => {
-      ts('ERROR', err instanceof Error ? err.stack ?? err.message : String(err))
+      ts(
+        'ERROR',
+        err instanceof Error ? (err.stack ?? err.message) : String(err),
+      )
     },
   })
 
@@ -76,13 +82,21 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
   bot.onMessage(async (msg: IncomingMessage) => {
     if (msg.type !== 'text' || !msg.text?.trim()) return
 
-    const preview = msg.text.length > 200 ? msg.text.slice(0, 200) + '...' : msg.text
+    const preview =
+      msg.text.length > 200 ? `${msg.text.slice(0, 200)}...` : msg.text
     ts('RECV', `${msg.userId}: ${preview}`)
 
-    try { await bot.sendTyping(msg.userId) } catch { /* best-effort */ }
+    try {
+      await bot.sendTyping(msg.userId)
+    } catch {
+      /* best-effort */
+    }
 
     try {
-      const text = await replyText(provider, { systemPrompt, userText: msg.text })
+      const text = await replyText(provider, {
+        systemPrompt,
+        userText: msg.text,
+      })
       if (!text) {
         await bot.reply(msg, '(no model output)')
         return
@@ -95,7 +109,10 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
       try {
         await bot.reply(msg, `LLM error: ${message}`)
       } catch (replyErr) {
-        ts('ERROR', replyErr instanceof Error ? replyErr.message : String(replyErr))
+        ts(
+          'ERROR',
+          replyErr instanceof Error ? replyErr.message : String(replyErr),
+        )
       }
     }
   })

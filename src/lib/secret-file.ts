@@ -19,6 +19,9 @@ export function ensureSecretDirectory(filePath: string): void {
 
 export function writeSecretJson(filePath: string, data: unknown): void {
   ensureSecretDirectory(filePath)
-  writeFileSync(filePath, JSON.stringify(data, null, 2), { encoding: 'utf-8', mode: 0o600 })
+  writeFileSync(filePath, JSON.stringify(data, null, 2), {
+    encoding: 'utf-8',
+    mode: 0o600,
+  })
   setModeBestEffort(filePath, 0o600)
 }

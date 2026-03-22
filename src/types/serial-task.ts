@@ -1,3 +1,1 @@
-export interface SerialTaskRunner {
-  <T>(task: () => Promise<T>): Promise<T>
-}
+export type SerialTaskRunner = <T>(task: () => Promise<T>) => Promise<T>

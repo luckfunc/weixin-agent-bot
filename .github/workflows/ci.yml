@@ -18,6 +18,7 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
+      - run: npm run check:biome
       - run: npm test
       - run: npm run build
 
@@ -40,6 +41,7 @@ jobs:
       - run: npm -v
 
       - run: npm ci
+      - run: npm run check:biome
       - run: npm test
       - run: npm run build
 

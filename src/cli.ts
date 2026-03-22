@@ -1,11 +1,11 @@
 #!/usr/bin/env node
 import 'dotenv/config'
 import { createRequire } from 'node:module'
+import { log as clackLog, intro, outro } from '@clack/prompts'
 import chalk from 'chalk'
-import { intro, outro, log as clackLog } from '@clack/prompts'
-import { resolveProviderFromEnv, promptProvider } from './auth/prompt.js'
-import { runWeixinBot } from './bot/weixin-runner.js'
 import type { ResolvedProvider } from '@/types/index.js'
+import { promptProvider, resolveProviderFromEnv } from './auth/prompt.js'
+import { runWeixinBot } from './bot/weixin-runner.js'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json') as { version: string }
@@ -51,7 +51,9 @@ async function main(): Promise<void> {
 
   const envProvider = resolveProviderFromEnv()
   if (envProvider && !reauth) {
-    clackLog.info(`Provider: ${chalk.cyan(envProvider.label)} / ${chalk.dim(envProvider.model)} ${chalk.dim('(env)')}`)
+    clackLog.info(
+      `Provider: ${chalk.cyan(envProvider.label)} / ${chalk.dim(envProvider.model)} ${chalk.dim('(env)')}`,
+    )
     provider = envProvider
   } else {
     provider = await promptProvider({ forceReauth: reauth })

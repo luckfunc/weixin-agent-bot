@@ -5,9 +5,12 @@ import { createSerialTaskRunner } from '../src/lib/serial-task.js'
 test('serial task runner recovers after a rejected task', async () => {
   const runSerialTask = createSerialTaskRunner()
 
-  await assert.rejects(runSerialTask(async () => {
-    throw new Error('boom')
-  }), /boom/)
+  await assert.rejects(
+    runSerialTask(async () => {
+      throw new Error('boom')
+    }),
+    /boom/,
+  )
 
   assert.equal(await runSerialTask(async () => 'ok'), 'ok')
 })

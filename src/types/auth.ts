@@ -14,5 +14,11 @@ export interface AuthStore {
 
 /** Matches @mariozechner/pi-ai/oauth getOAuthApiKey shape. */
 export interface CodexAuthFile {
-  'openai-codex': { type: 'oauth'; access: string; refresh: string; expires: number; [key: string]: unknown }
+  'openai-codex': {
+    type: 'oauth'
+    access: string
+    refresh: string
+    expires: number
+    [key: string]: unknown
+  }
 }

@@ -1,11 +1,11 @@
-import OpenAI from 'openai'
-import { completeSimple, getModel } from '@mariozechner/pi-ai'
-import { getOAuthApiKey } from '@mariozechner/pi-ai/oauth'
-import type { OAuthCredentials } from '@mariozechner/pi-ai/oauth'
 import type { AssistantMessage, TextContent } from '@mariozechner/pi-ai'
+import { completeSimple, getModel } from '@mariozechner/pi-ai'
+import type { OAuthCredentials } from '@mariozechner/pi-ai/oauth'
+import { getOAuthApiKey } from '@mariozechner/pi-ai/oauth'
+import OpenAI from 'openai'
+import type { ResolvedProvider } from '@/types/index.js'
 import { loadCodexAuth, saveCodexAuth } from '../auth/codex/store.js'
 import { createSerialTaskRunner } from '../lib/serial-task.js'
-import type { ResolvedProvider } from '@/types/index.js'
 
 function textFromAssistant(message: AssistantMessage): string {
   return message.content
@@ -17,7 +17,11 @@ function textFromAssistant(message: AssistantMessage): string {
 
 const withCodexAuthLock = createSerialTaskRunner()
 
-async function replyWithCodex(systemPrompt: string, userText: string, modelId: string): Promise<string> {
+async function replyWithCodex(
+  systemPrompt: string,
+  userText: string,
+  modelId: string,
+): Promise<string> {
   return withCodexAuthLock(async () => {
     let auth = loadCodexAuth()
     if (!auth) {
@@ -42,7 +46,12 @@ async function replyWithCodex(systemPrompt: string, userText: string, modelId: s
       },
       {
         apiKey: refreshed.apiKey,
-        transport: (process.env.CODEX_TRANSPORT as 'auto' | 'sse' | 'websocket' | undefined) ?? 'auto',
+        transport:
+          (process.env.CODEX_TRANSPORT as
+            | 'auto'
+            | 'sse'
+            | 'websocket'
+            | undefined) ?? 'auto',
       },
     )
     return textFromAssistant(response)
