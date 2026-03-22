@@ -41,6 +41,8 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # OIDC: npm >= 11.5.1 or publish may 404 — Node 24 ships a recent npm
+      # OIDC (Trusted Publisher on npm). Do not use --provenance while this repo is
+      # private — npm only accepts provenance from public GitHub repos (422 otherwise).
+      # After making the repo public, you can switch to: npm publish --provenance
       - name: Publish to npm via OIDC
-        run: npm publish --provenance
+        run: npm publish
