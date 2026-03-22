@@ -6,6 +6,7 @@ import OpenAI from 'openai'
 import type { ResolvedProvider } from '@/types/index.js'
 import { loadCodexAuth, saveCodexAuth } from '../auth/codex/store.js'
 import { createSerialTaskRunner } from '../lib/serial-task.js'
+import { replyWithDesktopTools } from './reply-agent.js'
 
 function textFromAssistant(message: AssistantMessage): string {
   return message.content
@@ -84,6 +85,9 @@ export async function replyText(
     userText: string
   },
 ): Promise<string> {
+  if (process.env.WEIXIN_DESKTOP_TOOLS === '1') {
+    return replyWithDesktopTools(provider, opts)
+  }
   if (provider.id === 'codex') {
     return replyWithCodex(opts.systemPrompt, opts.userText, provider.model)
   }

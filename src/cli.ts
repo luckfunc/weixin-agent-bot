@@ -28,8 +28,9 @@ if (args.has('--help') || args.has('-h')) {
     --version, -v   Show version
 
   ${chalk.dim('Environment')}
-    PROVIDER           Force a provider (openai, anthropic, gemini, moonshot, ...)
+    PROVIDER           Force a provider (openai, anthropic, gemini, codex, moonshot, ...)
     OPENAI_API_KEY     OpenAI key  (or any <PROVIDER>_API_KEY)
+    CODEX_MODEL        Model when PROVIDER=codex (after OAuth; default gpt-5.2)
     MODEL              Override model for any provider
     SYSTEM_PROMPT      Custom system prompt
 `)
