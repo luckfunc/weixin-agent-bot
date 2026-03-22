@@ -1,40 +1,40 @@
 # weixin-agent-bot
 
-[简体中文](README.zh-CN.md)
+[English](README.en.md)
 
-WeChat **iLink** + **LLM** CLI: pick **OpenAI API** or **ChatGPT / Codex (OAuth)**, scan QR to bind WeChat, then auto-reply with the model.
+微信 **iLink** + **大模型** 命令行工具：可选 **OpenAI API** 或 **ChatGPT / Codex（OAuth）**，扫码绑定微信后，用所选模型自动回复消息。
 
-**No OpenClaw deployment:** this runs as a normal **Node CLI** on your machine (or any server with Node). You **do not** need to set up or host WeChat **OpenClaw** — just install, scan the QR code, and wire up Codex, OpenAI, or other providers via env or prompts.
+**无需部署 OpenClaw：** 本项目是普通的 **Node 命令行**，在你本机或任意有 Node 的环境即可运行，**不必**单独搭建、托管微信 **OpenClaw** 智能体运行时；装好依赖、扫码登录，再按提示或 `.env` 配置 Codex、OpenAI 等即可。
 
-**License:** MIT
+**许可证：** MIT
 
-## Quick start (community)
+## 快速开始（社区用户）
 
-Requires **Node.js ≥ 22**.
+需要 **Node.js ≥ 22**。
 
 ```bash
-# Run the latest release without cloning (downloads on first run)
+# 无需克隆仓库，直接跑最新已发布版本（首次运行会下载）
 npx weixin-agent-bot@latest
 ```
 
-Then follow the prompts. Optional: create a `.env` in the current directory (see `.env.example` in the repo) so the CLI can skip questions — copy from [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example).
+按终端提示操作即可。可选：在当前目录创建 `.env`（参考仓库里的 `.env.example`），以便跳过部分交互——可从 [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example) 复制。
 
-**Flags:** `--help`, `--version`, `--force-login` (WeChat QR again), `--reauth` (re-select and re-authenticate the LLM provider).
+**常用参数：** `--help`、`--version`、`--force-login`（重新扫微信二维码登录）、`--reauth`（重新选择并登录大模型服务商，含 Codex OAuth）。
 
-## Develop from source
+## 从源码开发
 
 ```bash
 git clone https://github.com/luckfunc/weixin-agent-bot.git
 cd weixin-agent-bot
 npm install
 npm run dev
-# or: npm run build && node dist/cli.js
+# 或：npm run build && node dist/cli.js
 ```
 
-## WeChat SDK
+## 微信 SDK
 
-Uses [`@pinixai/weixin-bot`](https://www.npmjs.com/package/@pinixai/weixin-bot) (sources: **[epiral/weixin-bot](https://github.com/epiral/weixin-bot)**). `postinstall` runs a local build of that package because the npm tarball ships TypeScript only.
+使用 [`@pinixai/weixin-bot`](https://www.npmjs.com/package/@pinixai/weixin-bot)（源码：**[epiral/weixin-bot](https://github.com/epiral/weixin-bot)**）。`postinstall` 会在本地编译该依赖，因为 npm 包内仅有 TypeScript 源码。
 
-## Thanks
+## 致谢
 
-**[weixin-bot](https://github.com/epiral/weixin-bot)** by [@epiral](https://github.com/epiral) — thank you for the Node.js SDK and protocol work.
+**[weixin-bot](https://github.com/epiral/weixin-bot)**（作者 [@epiral](https://github.com/epiral)）——感谢提供的 Node.js SDK 与协议相关工作。
