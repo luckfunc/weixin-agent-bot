@@ -64,7 +64,42 @@ flowchart LR
   B -->|sendmessage| wechat
 ```
 
-## 7. 相关源码与配置
+## 7. OpenClaw 的原理与架构（对照）
+
+腾讯 **`@tencent-weixin/openclaw-weixin`** 等产品化路径里，微信侧协议与上文一致（`getupdates` / `sendmessage` / `context_token` 等），差异主要在**进程形态**：微信被做成 **OpenClaw 的一个「渠道插件」**，挂在 **OpenClaw Gateway** 上，与 **Agent / 技能（Skills）**、**模型** 在同一套运行时里协作。
+
+要点：
+
+- **微信 / iLink**：只做消息传输，不包含「遥控电脑」的语义。
+- **渠道插件**（如 `openclaw-weixin`）：实现扫码登录、长轮询、发消息、媒体 CDN 等，把聊天内容交给上层。
+- **Gateway / 路由**：把各渠道来的会话交给对应 Agent 配置（多账号、上下文隔离等由 OpenClaw 配置层处理，例如 `agents.mode`）。
+- **Agent / Skills**：多轮对话、工具调用、业务逻辑；**本机执行**（命令、文件、自动化）发生在这里或 Skills 所调用的进程里，而不是微信协议里。
+- **模型**：只负责推理与是否发起「工具调用」；真正执行仍在 **运行 OpenClaw 的那台机器** 上。
+
+下面是与本仓库「微信 → Node → LLM → 可选本机 shell」**同构**的一层抽象（OpenClaw 实际模块名以官方仓库为准）：
+
+```mermaid
+flowchart TB
+  subgraph wx [微信 / iLink]
+    U[用户]
+  end
+  subgraph oc [OpenClaw 典型部署]
+    GW[Gateway / 会话路由]
+    CH[渠道插件 例: openclaw-weixin]
+    AG[Agent / Skills]
+    LLM[大模型 API]
+    HOST[本机执行: Shell / 文件 / 其它工具]
+  end
+  U <-- HTTP: 收消息 / 发消息 --> CH
+  CH <--> GW
+  GW <--> AG
+  AG <--> LLM
+  AG <--> HOST
+```
+
+**与本项目的关系**：`weixin-agent-bot` 相当于把上图里的 **CH + 一段简化的 AG** 写进一个 Node CLI；若开启 `WEIXIN_DESKTOP_TOOLS`，则 **HOST** 对应本仓库的 `run_shell`（`tool-runtime`）。未使用 OpenClaw Gateway 时，没有插件热插拔与多技能生态，但**分层原理一致**：消息走微信协议，**操作电脑在宿主进程内完成**。
+
+## 8. 相关源码与配置
 
 | 说明 | 位置 |
 |------|------|
@@ -75,6 +110,6 @@ flowchart LR
 | 工具定义 | `src/llm/tools-def.ts` |
 | 环境变量示例 | 根目录 `.env.example` |
 
-## 8. 安全提示
+## 9. 安全提示
 
 开启 `WEIXIN_DESKTOP_TOOLS=1` 等价于允许 **能通过聊天触发 bot 的一方**（在模型配合下）间接执行 **你机器上的 shell**。仅应在**可信环境**下使用，并了解相关风险。
