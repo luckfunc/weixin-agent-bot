@@ -23,6 +23,12 @@
 - Reuse `test/helpers.ts` for fixtures, keeping each test focused on a single CLI flow.
 - After modifying providers or connection logic, rerun `npm run test` (or `npm run test -- provider-env.test.ts`) to ensure regressions are caught promptly.
 
+## npm publish & versioning
+- The npm registry **rejects** `npm publish` if that **exact** `version` in `package.json` is already published (`E409` / “cannot publish over previously published version”). A failed publish often means the version was not bumped.
+- **Any change that will be published to npm** must include a **new semver** in `package.json` (and a matching root `package.json` entry in `package-lock.json`, e.g. run `npm install --package-lock-only` after editing the version). Use `chore: bump version to x.y.z` in the same release flow when appropriate.
+- Pure docs-only or repo-only commits that **do not** go to npm do not require a version bump—but as soon as you cut a release, bump first, then publish.
+- `prepublishOnly` runs `npm run build`; still verify `npm run lint` / `npm test` before publishing.
+
 ## Commit & Pull Request Guidelines
 - Follow conventional commit prefixes (e.g., `fix(cli):`, `feat(bot):`, `docs:`, `chore:`) as seen in history.
 - PR descriptions should summarize the change, list commands you ran (build/test/lint), and link related issues or discussions.
