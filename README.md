@@ -1,5 +1,7 @@
 # weixin-agent-bot
 
+[简体中文](README.zh-CN.md)
+
 WeChat **iLink** + **LLM** CLI: pick **OpenAI API** or **ChatGPT / Codex (OAuth)**, scan QR to bind WeChat, then auto-reply with the model.
 
 **License:** MIT
