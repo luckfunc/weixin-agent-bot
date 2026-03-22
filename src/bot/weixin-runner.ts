@@ -1,4 +1,4 @@
-import { WeixinBot, type IncomingMessage } from '../weixin-sdk/index.js'
+import { WeixinBot, type IncomingMessage } from '@pinixai/weixin-bot'
 import OpenAI from 'openai'
 import qrterm from 'qrcode-terminal'
 import { replyText } from '../llm/reply.js'

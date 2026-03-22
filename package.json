@@ -2,6 +2,7 @@
   "name": "weixin-agent-bot",
   "version": "0.1.0",
   "description": "WeChat GPT Bot scaffold — connect any LLM to WeChat in minutes",
+  "license": "MIT",
   "type": "module",
   "bin": {
     "weixin-agent-bot": "dist/cli.js"
@@ -9,17 +10,21 @@
   "exports": "./dist/cli.js",
   "files": [
     "dist",
-    ".env.example"
+    "scripts",
+    ".env.example",
+    "LICENSE"
   ],
   "engines": {
     "node": ">=22"
   },
   "scripts": {
+    "postinstall": "node scripts/postinstall-weixin-bot.mjs",
     "build": "tsc",
     "dev": "tsx src/cli.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@pinixai/weixin-bot": "^1.2.0",
     "@clack/prompts": "^0.11.0",
     "@mariozechner/pi-ai": "^0.61.1",
     "chalk": "^5.6.2",
