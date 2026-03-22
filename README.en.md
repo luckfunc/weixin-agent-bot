@@ -19,7 +19,39 @@ npx -y weixin-agent-bot@latest
 
 Then follow the prompts. Optional: create a `.env` in the current directory (see `.env.example` in the repo) so the CLI can skip questions — copy from [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example).
 
-**Flags:** `--help`, `--version`, `--force-login` (WeChat QR again), `--reauth` (re-select and re-authenticate the LLM provider).
+### Common flags (copy-paste)
+
+Examples use **`npx -y weixin-agent-bot@latest`**. If you installed globally with **`npm install -g weixin-agent-bot`**, replace the prefix with **`weixin-agent-bot`** (keep the same flags).
+
+**`--help`** — print all options and environment variables:
+
+```bash
+npx -y weixin-agent-bot@latest --help
+```
+
+**`--version`** — print the CLI version:
+
+```bash
+npx -y weixin-agent-bot@latest --version
+```
+
+**`--force-login`** — ignore cached session and show the WeChat QR login again:
+
+```bash
+npx -y weixin-agent-bot@latest --force-login
+```
+
+**`--reauth`** — pick the LLM provider again and re-authenticate (including Codex OAuth):
+
+```bash
+npx -y weixin-agent-bot@latest --reauth
+```
+
+You can combine flags, e.g. fresh WeChat login and provider re-auth:
+
+```bash
+npx -y weixin-agent-bot@latest --force-login --reauth
+```
 
 ## Develop from source
 

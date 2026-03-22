@@ -19,7 +19,39 @@ npx -y weixin-agent-bot@latest
 
 按终端提示操作即可。可选：在当前目录创建 `.env`（参考仓库里的 `.env.example`），以便跳过部分交互——可从 [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example) 复制。
 
-**常用参数：** `--help`、`--version`、`--force-login`（重新扫微信二维码登录）、`--reauth`（重新选择并登录大模型服务商，含 Codex OAuth）。
+### 常用参数（可复制命令）
+
+下面统一用 **`npx -y weixin-agent-bot@latest`**；若你已 **`npm install -g weixin-agent-bot`** 全局安装，可把前缀换成 **`weixin-agent-bot`**（其余参数不变）。
+
+**`--help`** — 打印全部选项与环境变量说明：
+
+```bash
+npx -y weixin-agent-bot@latest --help
+```
+
+**`--version`** — 查看当前 CLI 版本号：
+
+```bash
+npx -y weixin-agent-bot@latest --version
+```
+
+**`--force-login`** — 忽略缓存，重新扫微信二维码登录：
+
+```bash
+npx -y weixin-agent-bot@latest --force-login
+```
+
+**`--reauth`** — 重新选择大模型服务商并走鉴权（含 Codex 浏览器 OAuth）：
+
+```bash
+npx -y weixin-agent-bot@latest --reauth
+```
+
+可同时带多个参数，例如既要重新扫码又要重新选模型：
+
+```bash
+npx -y weixin-agent-bot@latest --force-login --reauth
+```
 
 ## 从源码开发
 
