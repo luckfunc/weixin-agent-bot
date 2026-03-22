@@ -3,8 +3,8 @@ import { mkdtempSync, rmSync, statSync } from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import test from 'node:test'
-import { saveCodexAuth } from '../src/auth/codex/store.js'
-import { setActiveProvider } from '../src/auth/store.js'
+import { saveCodexAuth } from '../src/llm/codex/store.js'
+import { setActiveAuth } from '../src/persistence.js'
 import { withEnv } from './helpers.js'
 
 const skipOnWindows = process.platform === 'win32'
@@ -21,7 +21,7 @@ test('auth store writes provider secrets with private permissions', {
         AUTH_STORE_PATH: authPath,
       },
       () => {
-        setActiveProvider('openai', { provider: 'openai', apiKey: 'sk-test' })
+        setActiveAuth({ provider: 'openai', apiKey: 'sk-test' })
       },
     )
 
