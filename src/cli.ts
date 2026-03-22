@@ -3,10 +3,9 @@ import 'dotenv/config'
 import { createRequire } from 'node:module'
 import chalk from 'chalk'
 import { intro, outro, log as clackLog } from '@clack/prompts'
-import { resolveFromEnv } from './auth/resolve.js'
-import { promptLlmBackend, runLlmAuth } from './auth/prompt.js'
+import { resolveProviderFromEnv, promptProvider } from './auth/prompt.js'
 import { runWeixinBot } from './bot/weixin-runner.js'
-import type { LlmMode } from './llm/types.js'
+import type { ResolvedProvider } from './providers/types.js'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json') as { version: string }
@@ -23,10 +22,16 @@ if (args.has('--help') || args.has('-h')) {
     $ weixin-agent-bot [options]
 
   ${chalk.dim('Options')}
-    --force-login   Force WeChat QR re-login
-    --recodex       Force Codex OAuth re-authorization
+    --force-login   Force WeChat QR re-login (skip cached session)
+    --reauth        Re-select and re-authenticate LLM provider
     --help, -h      Show this message
     --version, -v   Show version
+
+  ${chalk.dim('Environment')}
+    PROVIDER           Force a provider (openai, anthropic, gemini, ...)
+    OPENAI_API_KEY     OpenAI key  (or any <PROVIDER>_API_KEY)
+    MODEL              Override model for any provider
+    SYSTEM_PROMPT      Custom system prompt
 `)
   process.exit(0)
 }
@@ -37,28 +42,24 @@ if (args.has('--version') || args.has('-v')) {
 }
 
 const forceLogin = args.has('--force-login')
-const recodex = args.has('--recodex')
+const reauth = args.has('--reauth')
 
 async function main(): Promise<void> {
   intro(chalk.bgCyan(chalk.black(` weixin-agent-bot v${pkg.version} `)))
 
-  // 1. Resolve model backend (env → auto, otherwise interactive)
-  let llmMode: LlmMode
-  const envMode = resolveFromEnv()
+  let provider: ResolvedProvider
 
-  if (envMode) {
-    clackLog.info(`Model backend: ${chalk.cyan(envMode)} (from environment)`)
-    llmMode = envMode
+  const envProvider = resolveProviderFromEnv()
+  if (envProvider && !reauth) {
+    clackLog.info(`Provider: ${chalk.cyan(envProvider.label)} / ${chalk.dim(envProvider.model)} ${chalk.dim('(env)')}`)
+    provider = envProvider
   } else {
-    llmMode = await promptLlmBackend()
+    provider = await promptProvider({ forceReauth: reauth })
   }
 
-  // 2. Authenticate
-  await runLlmAuth(llmMode, { recodex })
+  outro(chalk.dim(`Provider: ${provider.label} / ${provider.model}`))
 
-  // 3. Start WeChat bot
-  outro(chalk.dim('Starting WeChat bot...'))
-  await runWeixinBot({ llmMode, forceLogin })
+  await runWeixinBot({ provider, forceLogin })
 }
 
 main().catch((err) => {

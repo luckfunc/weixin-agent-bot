@@ -1,3 +1,3 @@
-export type LlmMode = 'openai' | 'codex'
+import type { ResolvedProvider } from '../providers/types.js'
 
-export type LlmBackendId = 'openai-api' | 'openai-codex'
+export type { ResolvedProvider }

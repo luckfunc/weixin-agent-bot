@@ -4,7 +4,7 @@ import { getOAuthApiKey } from '@mariozechner/pi-ai/oauth'
 import type { OAuthCredentials } from '@mariozechner/pi-ai/oauth'
 import type { AssistantMessage, TextContent } from '@mariozechner/pi-ai'
 import { loadCodexAuth, saveCodexAuth } from '../auth/codex/store.js'
-import type { LlmMode } from './types.js'
+import type { ResolvedProvider } from '../providers/types.js'
 
 function textFromAssistant(message: AssistantMessage): string {
   return message.content
@@ -30,7 +30,7 @@ async function replyWithCodex(systemPrompt: string, userText: string, modelId: s
   return withCodexAuthLock(async () => {
     let auth = loadCodexAuth()
     if (!auth) {
-      throw new Error('No Codex credentials; run: npm run codex:login')
+      throw new Error('No Codex credentials; run the CLI again to authenticate')
     }
     const refreshed = await getOAuthApiKey(
       'openai-codex',
@@ -58,14 +58,17 @@ async function replyWithCodex(systemPrompt: string, userText: string, modelId: s
   })
 }
 
-async function replyWithOpenAI(
-  openai: OpenAI,
-  model: string,
+async function replyWithOpenAICompat(
+  provider: ResolvedProvider,
   systemPrompt: string,
   userText: string,
 ): Promise<string> {
-  const completion = await openai.chat.completions.create({
-    model,
+  const client = new OpenAI({
+    apiKey: provider.apiKey ?? 'no-key',
+    baseURL: provider.baseUrl,
+  })
+  const completion = await client.chat.completions.create({
+    model: provider.model,
     messages: [
       { role: 'system', content: systemPrompt },
       { role: 'user', content: userText },
@@ -74,24 +77,15 @@ async function replyWithOpenAI(
   return completion.choices[0]?.message?.content?.trim() ?? ''
 }
 
-export type { LlmMode } from './types.js'
-
 export async function replyText(
-  mode: LlmMode,
+  provider: ResolvedProvider,
   opts: {
-    openai?: OpenAI
-    openaiModel?: string
-    codexModel?: string
     systemPrompt: string
     userText: string
   },
 ): Promise<string> {
-  if (mode === 'openai') {
-    if (!opts.openai || !opts.openaiModel) {
-      throw new Error('openai mode requires OpenAI client and model name')
-    }
-    return replyWithOpenAI(opts.openai, opts.openaiModel, opts.systemPrompt, opts.userText)
+  if (provider.id === 'codex') {
+    return replyWithCodex(opts.systemPrompt, opts.userText, provider.model)
   }
-  const modelId = opts.codexModel ?? 'gpt-5.2'
-  return replyWithCodex(opts.systemPrompt, opts.userText, modelId)
+  return replyWithOpenAICompat(provider, opts.systemPrompt, opts.userText)
 }

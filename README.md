@@ -27,15 +27,6 @@ npm run dev
 # or: npm run build && node dist/cli.js
 ```
 
-## Publish to npm (maintainers)
-
-1. [Create an npm account](https://www.npmjs.com/signup) and log in: `npm login`
-2. Bump version: `npm version patch` (or `minor` / `major`)
-3. Build and publish: `npm publish`
-4. Users can then run: `npx weixin-agent-bot@latest`
-
-Scoped packages (`@scope/name`) need `npm publish --access public` once.
-
 ## WeChat SDK
 
 Uses [`@pinixai/weixin-bot`](https://www.npmjs.com/package/@pinixai/weixin-bot) (sources: **[epiral/weixin-bot](https://github.com/epiral/weixin-bot)**). `postinstall` runs a local build of that package because the npm tarball ships TypeScript only.
