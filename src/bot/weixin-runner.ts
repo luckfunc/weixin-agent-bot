@@ -3,9 +3,9 @@ import qrterm from 'qrcode-terminal'
 import chalk from 'chalk'
 import { spinner, log as clackLog } from '@clack/prompts'
 import { replyText } from '../llm/reply.js'
-import type { WeixinBotOptions } from '#types'
+import type { WeixinBotOptions } from '@/types/index.js'
 
-export type { WeixinBotOptions } from '#types'
+export type { WeixinBotOptions } from '@/types/index.js'
 
 function ts(level: string, msg: string) {
   console.log(`${new Date().toISOString()} [${level}] ${msg}`)

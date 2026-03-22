@@ -5,7 +5,7 @@ import type { OAuthCredentials } from '@mariozechner/pi-ai/oauth'
 import type { AssistantMessage, TextContent } from '@mariozechner/pi-ai'
 import { loadCodexAuth, saveCodexAuth } from '../auth/codex/store.js'
 import { createSerialTaskRunner } from '../lib/serial-task.js'
-import type { ResolvedProvider } from '#types'
+import type { ResolvedProvider } from '@/types/index.js'
 
 function textFromAssistant(message: AssistantMessage): string {
   return message.content

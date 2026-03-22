@@ -1,4 +1,4 @@
-import type { SerialTaskRunner } from '#types'
+import type { SerialTaskRunner } from '@/types/index.js'
 
 export function createSerialTaskRunner(): SerialTaskRunner {
   let chain = Promise.resolve<void>(undefined)

@@ -1,10 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
-import type { CodexAuthFile } from '#types'
+import type { CodexAuthFile } from '@/types/index.js'
 import { writeSecretJson } from '../../lib/secret-file.js'
 
-export type { CodexAuthFile } from '#types'
+export type { CodexAuthFile } from '@/types/index.js'
 
 const defaultPath = path.join(homedir(), '.weixin-gpt', 'codex-auth.json')
 

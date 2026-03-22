@@ -2,7 +2,7 @@
 
 ## Project Structure & Module Organization
 - `src/cli.ts` is the CLI entry that wires prompts, environment resolution, and the bot runner.
-- **Types** live under `src/types/` (barrel `src/types/index.ts`). Import shared types with `#types` (Node `package.json` `imports` maps `#types` → `dist/types/index.js`; `tsconfig` `paths` mirrors this for `tsc` / `tsx`). Do not use the npm `@types/*` scope for app types—that name is reserved for DefinitelyTyped packages.
+- **Types** live under `src/types/` (barrel `src/types/index.ts`). Import shared types with **`@/types/index.js`** (see `tsconfig` `paths`: `@/*` → `./src/*`). After `tsc`, **`tsc-alias`** rewrites those specifiers to relative paths in `dist/`, so the published CLI does not depend on path aliases at runtime. Do not publish app types under the npm **`@types/*`** scope—that is reserved for DefinitelyTyped packages.
 - Feature code lives under `src/{auth,bot,llm,providers,lib}`; place shared utilities in `src/lib`.
 - Built artifacts land in `dist/`, tests live under `test/`, helper tooling resides in `scripts/`, and configuration lives at the root (`package.json`, `tsconfig.json`, `.env.example`, `LICENSE`).
 

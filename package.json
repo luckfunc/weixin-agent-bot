@@ -1,6 +1,6 @@
 {
   "name": "weixin-agent-bot",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "WeChat iLink + LLM CLI — connect OpenAI or Codex to WeChat in minutes",
   "license": "MIT",
   "author": "luckfunc",
@@ -24,10 +24,6 @@
     "llm"
   ],
   "type": "module",
-  "imports": {
-    "#types": "./dist/types/index.js",
-    "#types/*": "./dist/types/*.js"
-  },
   "bin": {
     "weixin-agent-bot": "dist/cli.js"
   },
@@ -45,14 +41,14 @@
     "postinstall": "node scripts/postinstall-weixin-bot.mjs",
     "lint": "tsc --noEmit",
     "test": "tsx --test test/**/*.test.ts",
-    "build": "tsc",
+    "build": "tsc && tsc-alias -p tsconfig.json",
     "dev": "tsx src/cli.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@pinixai/weixin-bot": "^1.2.0",
     "@clack/prompts": "^0.11.0",
     "@mariozechner/pi-ai": "^0.61.1",
+    "@pinixai/weixin-bot": "^1.2.0",
     "chalk": "^5.6.2",
     "dotenv": "^16.4.5",
     "openai": "^4.73.0",
@@ -61,6 +57,7 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@types/qrcode-terminal": "^0.12.2",
+    "tsc-alias": "^1.8.16",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   }

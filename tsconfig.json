@@ -11,8 +11,7 @@
     "rootDir": "src",
     "baseUrl": ".",
     "paths": {
-      "#types": ["./src/types/index.ts"],
-      "#types/*": ["./src/types/*.ts"]
+      "@/*": ["./src/*"]
     },
     "esModuleInterop": true
   },

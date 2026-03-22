@@ -1,7 +1,7 @@
 import OpenAI from 'openai'
-import type { FetchModelsOptions } from '#types'
+import type { FetchModelsOptions } from '@/types/index.js'
 
-export type { FetchModelsOptions } from '#types'
+export type { FetchModelsOptions } from '@/types/index.js'
 
 /**
  * Fetch available model IDs from an OpenAI-compatible /v1/models endpoint.
