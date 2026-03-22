@@ -41,8 +41,6 @@ jobs:
       - run: npm ci
       - run: npm run build
 
-      # OIDC (Trusted Publisher on npm). Do not use --provenance while this repo is
-      # private — npm only accepts provenance from public GitHub repos (422 otherwise).
-      # After making the repo public, you can switch to: npm publish --provenance
+      # OIDC + provenance (repo must be public on GitHub for provenance to be accepted by npm)
       - name: Publish to npm via OIDC
-        run: npm publish
+        run: npm publish --provenance
