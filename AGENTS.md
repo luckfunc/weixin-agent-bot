@@ -1,15 +1,18 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `src/cli.ts` is the CLI entry that wires prompts, environment resolution, and the bot runner.
+- `src/cli.ts` is the CLI entry that wires OpenAI config resolution and the WeChat runner.
 - **Types** live under `src/types/` (barrel `src/types/index.ts`). Import shared types with **`@/types/index.js`** (see `tsconfig` `paths`: `@/*` → `./src/*`). After `tsc`, **`tsc-alias`** rewrites those specifiers to relative paths in `dist/`, so the published CLI does not depend on path aliases at runtime. Do not publish app types under the npm **`@types/*`** scope—that is reserved for DefinitelyTyped packages.
-- Feature code lives under `src/{auth,bot,llm,providers,lib}`; place shared utilities in `src/lib`.
+- **LLM** integrations live under `src/llm/` — `openai/` (API key Chat Completions), `codex/` (ChatGPT OAuth via `@mariozechner/pi-ai`), `runtime.ts` (resolve + prompts). Re-export: `src/llm/index.ts`. Codex OAuth helpers: `src/auth/codex/`.
+- **WeChat** bridge lives under `src/wechat/` (`runner.ts`).
+- **Persistence** (saved API profile) lives under `src/persistence/` (`auth-store.ts`).
+- Shared utilities live under `src/lib/`.
 - Built artifacts land in `dist/`, tests live under `test/`, helper tooling resides in `scripts/`, and configuration lives at the root (`package.json`, `tsconfig.json`, `.env.example`, `LICENSE`).
 
 ## Build, Test, and Development Commands
 - `npm run dev` launches `tsx src/cli.ts` for interactive development without writing output.
 - `npm run build` runs `tsc` to emit `dist/cli.js`, matching the published `weixin-agent-bot` binary.
-- `npm run test` executes `tsx --test test/**/*.test.ts`, covering provider-env, secret-file, and serial-task flows without separate compilation.
+- `npm run test` executes `tsx --test test/**/*.test.ts`, covering OpenAI env resolution, secret-file, and serial-task flows without separate compilation.
 - `npm run lint` runs `tsc --noEmit` as a strict type check and should precede merges.
 - `npm run check:biome` runs **Biome** (format + lint + import organization); `npm run format` applies safe fixes. Config: `biome.json` (initialized with `@biomejs/biome init`; the separate `create-biome` CLI is interactive-only—use it from a real terminal if you prefer that wizard).
 - `npm run postinstall` builds `@pinixai/weixin-bot` from `scripts/postinstall-weixin-bot.mjs`; rerun only when SDK or environment changes require it.
@@ -18,12 +21,12 @@
 - The project targets Node ≥22 with `moduleResolution: NodeNext`, so prefer ES module imports/exports and respect `type: module`.
 - Use two-space indentation, single quotes, and minimal semicolons; `tsc` is configured with `strict`, `esModuleInterop`, `declaration`, and `sourceMap`.
 - Favor camelCase for locals/functions, PascalCase for exports, and lowercase/hyphenated file names for multiword modules.
-- Keep CLI orchestration inside `src/cli.ts`, delegate provider handling to `src/providers`, and place shared bot/LLM sequences in `src/bot` or `src/llm`.
+- Keep CLI orchestration inside `src/cli.ts`; LLM vendors under `src/llm/<vendor>/`, WeChat lifecycle in `src/wechat/`.
 
 ## Testing Guidelines
 - Tests live in `test/*.test.ts`; `tsx --test` executes them in TypeScript without extra builds.
 - Reuse `test/helpers.ts` for fixtures, keeping each test focused on a single CLI flow.
-- After modifying providers or connection logic, rerun `npm run test` (or `npm run test -- provider-env.test.ts`) to ensure regressions are caught promptly.
+- After modifying LLM or WeChat connection logic, rerun `npm run test` (or `npm run test -- openai-resolve.test.ts`) to ensure regressions are caught promptly.
 
 ## npm publish & versioning
 - The npm registry **rejects** `npm publish` if that **exact** `version` in `package.json` is already published (`E409` / “cannot publish over previously published version”). A failed publish often means the version was not bumped.
@@ -37,5 +40,5 @@
 - Attach logs or screenshots only if the CLI behavior changes visibly or an error flow is being documented.
 
 ## Security & Configuration Tips
-- Copy `.env.example` to `.env` for local runs; avoid checking secrets into Git. The CLI respects `PROVIDER`, `OPENAI_API_KEY`, `MODEL`, `SYSTEM_PROMPT`, and cached session indicators unless `--force-login`/`--reauth` is used.
+- Copy `.env.example` to `.env` for local runs; avoid checking secrets into Git. The CLI supports **OpenAI API** (`OPENAI_API_KEY`, …) or **Codex OAuth** (`PROVIDER=codex`, token file at `CODEX_AUTH_PATH` or `~/.weixin-agent-bot/codex-auth.json`), plus `SYSTEM_PROMPT`, `CHAT_MAX_MESSAGES`, and saved `auth.json` unless `--force-login`/`--reauth` is used.
 - Keep `npm install`/`npm run postinstall` in sync so the bundled `@pinixai/weixin-bot` code stays in lockstep with the TypeScript source expected by this repo.

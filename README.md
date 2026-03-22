@@ -2,9 +2,9 @@
 
 [English](README.en.md)
 
-微信 **iLink** + **大模型** 命令行工具：可选 **OpenAI**、**DeepSeek**、**Kimi (Moonshot)**、**ChatGPT / Codex（OAuth）** 等，扫码绑定微信后，用所选模型自动回复消息。
+微信 **iLink** + **GPT** 命令行工具：可用 **OpenAI API Key**，或 **ChatGPT / Codex 浏览器登录（OAuth，与以前一样）**；扫码绑定微信后按所选模型自动回复（支持多轮对话）。
 
-**无需部署 OpenClaw：** 本项目是普通的 **Node 命令行**，在你本机或任意有 Node 的环境即可运行，**不必**单独搭建、托管微信 **OpenClaw** 智能体运行时；装好依赖、扫码登录，再按提示或 `.env` 配置 Codex、OpenAI 等即可。
+**无需部署 OpenClaw：** 本项目是普通的 **Node 命令行**，在你本机或任意有 Node 的环境即可运行，**不必**单独搭建、托管微信 **OpenClaw** 智能体运行时；装好依赖、扫码登录，再按提示或 `.env` 配置 `OPENAI_API_KEY` / `PROVIDER=codex` 等即可。
 
 **许可证：** MIT
 
@@ -56,7 +56,7 @@ npx -y weixin-agent-bot@latest --version
 npx -y weixin-agent-bot@latest --force-login
 ```
 
-**`--reauth`** — 重新选择大模型服务商并走鉴权（含 Codex 浏览器 OAuth）：
+**`--reauth`** — 重新选择登录方式（API Key 或浏览器 OAuth）并重新鉴权：
 
 ```bash
 npx -y weixin-agent-bot@latest --reauth

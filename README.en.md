@@ -2,9 +2,9 @@
 
 [简体中文](README.md)
 
-WeChat **iLink** + **LLM** CLI: pick **OpenAI API** or **ChatGPT / Codex (OAuth)**, scan QR to bind WeChat, then auto-reply with the model.
+WeChat **iLink** + **GPT** CLI: use an **OpenAI API key** *or* **ChatGPT / Codex browser OAuth** (same style as before). Scan QR to bind WeChat, then auto-reply with your chosen model (multi-turn per user).
 
-**No OpenClaw deployment:** this runs as a normal **Node CLI** on your machine (or any server with Node). You **do not** need to set up or host WeChat **OpenClaw** — just install, scan the QR code, and wire up Codex, OpenAI, or other providers via env or prompts.
+**No OpenClaw deployment:** this runs as a normal **Node CLI** on your machine (or any server with Node). You **do not** need to set up or host WeChat **OpenClaw** — configure `OPENAI_API_KEY` and/or `PROVIDER=codex` via `.env` or prompts.
 
 **License:** MIT
 
@@ -56,13 +56,13 @@ npx -y weixin-agent-bot@latest --version
 npx -y weixin-agent-bot@latest --force-login
 ```
 
-**`--reauth`** — pick the LLM provider again and re-authenticate (including Codex OAuth):
+**`--reauth`** — pick sign-in method again (API key vs browser OAuth) and re-authenticate:
 
 ```bash
 npx -y weixin-agent-bot@latest --reauth
 ```
 
-You can combine flags, e.g. fresh WeChat login and provider re-auth:
+You can combine flags, e.g. fresh WeChat login and OpenAI re-auth:
 
 ```bash
 npx -y weixin-agent-bot@latest --force-login --reauth
