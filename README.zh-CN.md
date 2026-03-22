@@ -2,6 +2,8 @@
 
 微信 **iLink** + **大模型** 命令行工具：可选 **OpenAI API** 或 **ChatGPT / Codex（OAuth）**，扫码绑定微信后，用所选模型自动回复消息。
 
+**无需部署 OpenClaw：** 本项目是普通的 **Node 命令行**，在你本机或任意有 Node 的环境即可运行，**不必**单独搭建、托管微信 **OpenClaw** 智能体运行时；装好依赖、扫码登录，再按提示或 `.env` 配置 Codex、OpenAI 等即可。
+
 **许可证：** MIT
 
 [English README](README.md)

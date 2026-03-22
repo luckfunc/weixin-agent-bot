@@ -4,6 +4,8 @@
 
 WeChat **iLink** + **LLM** CLI: pick **OpenAI API** or **ChatGPT / Codex (OAuth)**, scan QR to bind WeChat, then auto-reply with the model.
 
+**No OpenClaw deployment:** this runs as a normal **Node CLI** on your machine (or any server with Node). You **do not** need to set up or host WeChat **OpenClaw** — just install, scan the QR code, and wire up Codex, OpenAI, or other providers via env or prompts.
+
 **License:** MIT
 
 ## Quick start (community)
