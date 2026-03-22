@@ -12,16 +12,31 @@ WeChat **iLink** + **LLM** CLI: pick **OpenAI API** or **ChatGPT / Codex (OAuth)
 
 Requires **Node.js ≥ 22**.
 
+**Option A: `npx` (no global install)** — type the package name each time; good for occasional use.
+
 ```bash
 # Run the latest release without cloning (downloads on first run; -y skips install prompt)
 npx -y weixin-agent-bot@latest
+```
+
+**Option B: global install** — install once, then run `weixin-agent-bot` from any directory.
+
+```bash
+npm install -g weixin-agent-bot@latest
+weixin-agent-bot
+```
+
+Upgrade the global install:
+
+```bash
+npm install -g weixin-agent-bot@latest
 ```
 
 Then follow the prompts. Optional: create a `.env` in the current directory (see `.env.example` in the repo) so the CLI can skip questions — copy from [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example).
 
 ### Common flags (copy-paste)
 
-Examples use **`npx -y weixin-agent-bot@latest`**. If you installed globally with **`npm install -g weixin-agent-bot`**, replace the prefix with **`weixin-agent-bot`** (keep the same flags).
+Examples below use **`npx`**. If you used **Option B**, replace **`npx -y weixin-agent-bot@latest …`** with **`weixin-agent-bot …`** (same flags).
 
 **`--help`** — print all options and environment variables:
 

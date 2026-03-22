@@ -12,16 +12,31 @@
 
 需要 **Node.js ≥ 22**。
 
+**方式一：用 `npx`（不必全局安装）** — 每次前缀带包名；适合偶尔使用。
+
 ```bash
 # 无需克隆仓库，直接跑最新已发布版本（首次运行会下载；-y 表示无需确认安装）
 npx -y weixin-agent-bot@latest
+```
+
+**方式二：全局安装** — 装一次后，任意目录可直接打 `weixin-agent-bot`。
+
+```bash
+npm install -g weixin-agent-bot@latest
+weixin-agent-bot
+```
+
+升级全局版本：
+
+```bash
+npm install -g weixin-agent-bot@latest
 ```
 
 按终端提示操作即可。可选：在当前目录创建 `.env`（参考仓库里的 `.env.example`），以便跳过部分交互——可从 [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example) 复制。
 
 ### 常用参数（可复制命令）
 
-下面统一用 **`npx -y weixin-agent-bot@latest`**；若你已 **`npm install -g weixin-agent-bot`** 全局安装，可把前缀换成 **`weixin-agent-bot`**（其余参数不变）。
+下面示例**默认用 `npx`**；若已按上面 **方式二全局安装**，把命令里的 **`npx -y weixin-agent-bot@latest …`** 换成 **`weixin-agent-bot …`** 即可（参数不变）。
 
 **`--help`** — 打印全部选项与环境变量说明：
 
