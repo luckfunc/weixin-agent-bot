@@ -1,7 +1,7 @@
 {
   "name": "weixin-agent-bot",
-  "version": "0.1.17",
-  "description": "WeChat iLink + LLM CLI — connect OpenAI or Codex to WeChat in minutes",
+  "version": "0.3.0",
+  "description": "WeChat iLink + GPT CLI — OpenAI API key or ChatGPT/Codex OAuth",
   "license": "MIT",
   "author": "luckfunc",
   "repository": {
@@ -21,9 +21,7 @@
     "codex",
     "cli",
     "bot",
-    "llm",
-    "moonshot",
-    "kimi"
+    "llm"
   ],
   "type": "module",
   "bin": {
