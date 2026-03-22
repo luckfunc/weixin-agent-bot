@@ -8,37 +8,74 @@ import { ensureCodexAuth } from './codex/oauth-flow.js'
 import { loadCodexAuth } from './codex/store.js'
 
 /**
- * Resolve provider from explicit env vars only (non-interactive).
- * Returns undefined when no env config is found.
+ * Resolve provider for non-interactive runs.
+ * Returns undefined when no reusable env/local config is found.
  */
 export function resolveProviderFromEnv(): ResolvedProvider | undefined {
-  const explicit = process.env.PROVIDER
+  const explicit = process.env.PROVIDER?.trim()
   if (explicit) {
     const def = getProvider(explicit)
     if (!def) return undefined
-    return resolveProviderEnvAuth(def)
+    return resolveExplicitProvider(def)
   }
 
   for (const def of getAllProviders()) {
-    const resolved = resolveProviderEnvAuth(def)
+    const resolved = resolveApiKeyProviderFromEnv(def)
     if (resolved) return resolved
   }
 
   return undefined
 }
 
-function resolveProviderEnvAuth(def: ProviderDef): ResolvedProvider | undefined {
-  if (def.authKind === 'none' || def.authKind === 'oauth') return undefined
+function providerModelEnvKey(def: ProviderDef): string {
+  return `${def.id.toUpperCase().replace(/-/g, '_')}_MODEL`
+}
+
+function modelFromEnv(def: ProviderDef): string | undefined {
+  return process.env[providerModelEnvKey(def)]?.trim() ?? process.env.MODEL?.trim()
+}
+
+function resolveExplicitProvider(def: ProviderDef): ResolvedProvider | undefined {
+  if (def.authKind === 'none') {
+    const baseUrl = def.id === 'ollama' ? process.env.OLLAMA_BASE_URL?.trim() ?? def.baseUrl : def.baseUrl
+    return {
+      id: def.id,
+      label: def.label,
+      baseUrl,
+      model: modelFromEnv(def) ?? def.defaultModel,
+    }
+  }
+
+  if (def.authKind === 'oauth') {
+    if (def.id === 'codex' && !loadCodexAuth()) return undefined
+    return {
+      id: def.id,
+      label: def.label,
+      model: modelFromEnv(def) ?? def.defaultModel,
+    }
+  }
+
+  return resolveApiKeyProviderFromEnv(def)
+}
+
+function resolveApiKeyProviderFromEnv(def: ProviderDef): ResolvedProvider | undefined {
+  if (def.authKind !== 'api_key') return undefined
+
+  let baseUrl = def.baseUrl
+  if (def.id === 'openai-compat') {
+    baseUrl = process.env.OPENAI_COMPAT_BASE_URL?.trim()
+    if (!baseUrl) return undefined
+  }
+
   for (const envKey of def.envKeys) {
     const val = process.env[envKey]?.trim()
     if (val) {
-      const modelEnv = `${def.id.toUpperCase().replace(/-/g, '_')}_MODEL`
       return {
         id: def.id,
         label: def.label,
         apiKey: val,
-        baseUrl: def.baseUrl,
-        model: process.env[modelEnv] ?? def.defaultModel,
+        baseUrl,
+        model: modelFromEnv(def) ?? def.defaultModel,
       }
     }
   }
@@ -102,12 +139,15 @@ export async function promptProvider(opts?: { forceReauth?: boolean }): Promise<
     }
   }
 
-  return runProviderAuth(def)
+  return runProviderAuth(def, { forceReauth })
 }
 
-export async function runProviderAuth(def: ProviderDef): Promise<ResolvedProvider> {
+export async function runProviderAuth(
+  def: ProviderDef,
+  opts: { forceReauth?: boolean } = {},
+): Promise<ResolvedProvider> {
   if (def.authKind === 'none') return handleNoAuth(def)
-  if (def.authKind === 'oauth') return handleOAuth(def)
+  if (def.authKind === 'oauth') return handleOAuth(def, opts)
   return handleApiKey(def)
 }
 
@@ -125,14 +165,18 @@ async function handleNoAuth(def: ProviderDef): Promise<ResolvedProvider> {
   return resolved
 }
 
-async function handleOAuth(def: ProviderDef): Promise<ResolvedProvider> {
+async function handleOAuth(def: ProviderDef, opts: { forceReauth?: boolean }): Promise<ResolvedProvider> {
   if (def.id === 'codex') {
+    const forceReauth = opts.forceReauth ?? false
     const hasAuth = loadCodexAuth()
-    if (hasAuth) {
+    if (hasAuth && !forceReauth) {
       note(chalk.dim('Codex credentials found.'), chalk.green(def.label))
     } else {
-      note(chalk.dim('Opening browser for OAuth — follow any terminal prompts.'), `${def.label} sign-in`)
-      await ensureCodexAuth({ force: false })
+      note(
+        chalk.dim('Opening browser for OAuth — follow any terminal prompts.'),
+        forceReauth ? `${def.label} re-auth` : `${def.label} sign-in`,
+      )
+      await ensureCodexAuth({ force: forceReauth })
     }
 
     const model = await promptModel(def, {})
@@ -206,8 +250,7 @@ interface PromptModelAuth {
 }
 
 async function promptModel(def: ProviderDef, auth: PromptModelAuth): Promise<string> {
-  const envKey = `${def.id.toUpperCase().replace(/-/g, '_')}_MODEL`
-  const envModel = process.env[envKey]?.trim() ?? process.env.MODEL?.trim()
+  const envModel = modelFromEnv(def)
   if (envModel) {
     log.info(`Model: ${chalk.cyan(envModel)} ${chalk.dim('(env)')}`)
     return envModel

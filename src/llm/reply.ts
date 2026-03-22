@@ -4,6 +4,7 @@ import { getOAuthApiKey } from '@mariozechner/pi-ai/oauth'
 import type { OAuthCredentials } from '@mariozechner/pi-ai/oauth'
 import type { AssistantMessage, TextContent } from '@mariozechner/pi-ai'
 import { loadCodexAuth, saveCodexAuth } from '../auth/codex/store.js'
+import { createSerialTaskRunner } from '../lib/serial-task.js'
 import type { ResolvedProvider } from '../providers/types.js'
 
 function textFromAssistant(message: AssistantMessage): string {
@@ -14,17 +15,7 @@ function textFromAssistant(message: AssistantMessage): string {
     .trim()
 }
 
-let codexAuthChain: Promise<void> = Promise.resolve()
-
-async function withCodexAuthLock<T>(fn: () => Promise<T>): Promise<T> {
-  let result!: T
-  const next = codexAuthChain.then(async () => {
-    result = await fn()
-  })
-  codexAuthChain = next.then(() => {})
-  await next
-  return result
-}
+const withCodexAuthLock = createSerialTaskRunner()
 
 async function replyWithCodex(systemPrompt: string, userText: string, modelId: string): Promise<string> {
   return withCodexAuthLock(async () => {

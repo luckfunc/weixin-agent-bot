@@ -40,6 +40,7 @@
   "scripts": {
     "postinstall": "node scripts/postinstall-weixin-bot.mjs",
     "lint": "tsc --noEmit",
+    "test": "tsx --test test/**/*.test.ts",
     "build": "tsc",
     "dev": "tsx src/cli.ts",
     "prepublishOnly": "npm run build"

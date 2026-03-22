@@ -6,7 +6,7 @@ import { openUrlInBrowser } from '../../lib/open-url.js'
 export async function ensureCodexAuth(options: { force?: boolean } = {}): Promise<void> {
   if (!options.force && loadCodexAuth()) {
     console.log(`[Codex] Credentials found, skipping browser login (${codexAuthPath()})`)
-    console.log('[Codex] To sign in again: npm start -- --recodex\n')
+    console.log('[Codex] To sign in again, run the CLI with --reauth.\n')
     return
   }
 

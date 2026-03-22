@@ -15,7 +15,7 @@ npx weixin-agent-bot@latest
 
 Then follow the prompts. Optional: create a `.env` in the current directory (see `.env.example` in the repo) so the CLI can skip questions — copy from [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example).
 
-**Flags:** `--help`, `--version`, `--force-login` (WeChat QR again), `--recodex` (Codex OAuth again).
+**Flags:** `--help`, `--version`, `--force-login` (WeChat QR again), `--reauth` (re-select and re-authenticate the LLM provider).
 
 ## Develop from source
 

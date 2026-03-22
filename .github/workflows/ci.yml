@@ -18,6 +18,7 @@ jobs:
 
       - run: npm ci
       - run: npm run lint
+      - run: npm test
       - run: npm run build
 
   publish-npm:
@@ -39,6 +40,7 @@ jobs:
       - run: npm -v
 
       - run: npm ci
+      - run: npm test
       - run: npm run build
 
       # OIDC + provenance (repo must be public on GitHub for provenance to be accepted by npm)

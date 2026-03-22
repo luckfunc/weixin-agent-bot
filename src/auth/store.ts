@@ -1,6 +1,7 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
+import { writeSecretJson } from '../lib/secret-file.js'
 
 export interface AuthProfile {
   provider: string
@@ -34,8 +35,7 @@ export function loadAuthStore(): AuthStore {
 
 export function saveAuthStore(store: AuthStore): void {
   const p = storePath()
-  mkdirSync(path.dirname(p), { recursive: true })
-  writeFileSync(p, JSON.stringify(store, null, 2), 'utf-8')
+  writeSecretJson(p, store)
 }
 
 export function getActiveProfile(): AuthProfile | undefined {

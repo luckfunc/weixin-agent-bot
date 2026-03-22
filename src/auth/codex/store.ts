@@ -1,6 +1,7 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
+import { writeSecretJson } from '../../lib/secret-file.js'
 
 /** Matches @mariozechner/pi-ai/oauth getOAuthApiKey shape. */
 export interface CodexAuthFile {
@@ -25,6 +26,5 @@ export function loadCodexAuth(): CodexAuthFile | null {
 
 export function saveCodexAuth(data: CodexAuthFile): void {
   const p = codexAuthPath()
-  mkdirSync(path.dirname(p), { recursive: true })
-  writeFileSync(p, JSON.stringify(data, null, 2), 'utf-8')
+  writeSecretJson(p, data)
 }

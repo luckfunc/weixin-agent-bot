@@ -23,6 +23,13 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
   // --- Login with spinner & inline QR ---
   const loginSpinner = spinner()
   loginSpinner.start(forceLogin ? 'Generating WeChat QR code...' : 'Connecting to WeChat...')
+  let loginSpinnerStopped = false
+
+  function stopLoginSpinner(message: string): void {
+    if (loginSpinnerStopped) return
+    loginSpinner.stop(message)
+    loginSpinnerStopped = true
+  }
 
   let qrShown = false
   const origStderrWrite = process.stderr.write.bind(process.stderr)
@@ -30,7 +37,7 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
     const str = typeof chunk === 'string' ? chunk : String(chunk)
     if (str.startsWith('https://') && str.includes('qrcode=')) {
       if (!qrShown) {
-        loginSpinner.stop('Scan this QR code with WeChat:')
+        stopLoginSpinner('Scan this QR code with WeChat:')
         qrShown = true
       }
       qrterm.generate(str.trim(), { small: true }, (qr: string) => {
@@ -48,13 +55,24 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
     },
   })
 
-  const creds = await bot.login({ force: forceLogin })
-  process.stderr.write = origStderrWrite
+  let creds: Awaited<ReturnType<WeixinBot['login']>>
+  try {
+    creds = await bot.login({ force: forceLogin })
+  } catch (err) {
+    if (qrShown) {
+      clackLog.error('WeChat login failed')
+    } else {
+      stopLoginSpinner('WeChat login failed')
+    }
+    throw err
+  } finally {
+    process.stderr.write = origStderrWrite
+  }
 
   if (qrShown) {
     clackLog.success(`WeChat connected — ${chalk.dim(creds.accountId)}`)
   } else {
-    loginSpinner.stop(`WeChat connected — ${chalk.dim(creds.accountId)}`)
+    stopLoginSpinner(`WeChat connected — ${chalk.dim(creds.accountId)}`)
   }
 
   // --- Message handler ---
