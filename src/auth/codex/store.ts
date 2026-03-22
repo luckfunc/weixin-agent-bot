@@ -1,12 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
+import type { CodexAuthFile } from '#types'
 import { writeSecretJson } from '../../lib/secret-file.js'
 
-/** Matches @mariozechner/pi-ai/oauth getOAuthApiKey shape. */
-export interface CodexAuthFile {
-  'openai-codex': { type: 'oauth'; access: string; refresh: string; expires: number; [key: string]: unknown }
-}
+export type { CodexAuthFile } from '#types'
 
 const defaultPath = path.join(homedir(), '.weixin-gpt', 'codex-auth.json')
 

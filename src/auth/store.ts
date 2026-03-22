@@ -1,20 +1,10 @@
 import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
+import type { AuthProfile, AuthStore } from '#types'
 import { writeSecretJson } from '../lib/secret-file.js'
 
-export interface AuthProfile {
-  provider: string
-  apiKey?: string
-  baseUrl?: string
-  model?: string
-}
-
-export interface AuthStore {
-  version: number
-  activeProvider?: string
-  profiles: Record<string, AuthProfile>
-}
+export type { AuthProfile, AuthStore } from '#types'
 
 const defaultDir = path.join(homedir(), '.weixin-agent-bot')
 const defaultPath = path.join(defaultDir, 'auth.json')

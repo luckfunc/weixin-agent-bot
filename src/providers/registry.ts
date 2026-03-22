@@ -1,4 +1,4 @@
-import type { ProviderDef } from './types.js'
+import type { ProviderDef } from '#types'
 
 const providers: ProviderDef[] = [
   {

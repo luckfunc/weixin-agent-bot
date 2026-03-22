@@ -1,9 +1,7 @@
 import OpenAI from 'openai'
+import type { FetchModelsOptions } from '#types'
 
-export interface FetchModelsOptions {
-  apiKey: string
-  baseUrl?: string
-}
+export type { FetchModelsOptions } from '#types'
 
 /**
  * Fetch available model IDs from an OpenAI-compatible /v1/models endpoint.

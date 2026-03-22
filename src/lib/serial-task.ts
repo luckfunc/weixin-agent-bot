@@ -1,6 +1,4 @@
-export interface SerialTaskRunner {
-  <T>(task: () => Promise<T>): Promise<T>
-}
+import type { SerialTaskRunner } from '#types'
 
 export function createSerialTaskRunner(): SerialTaskRunner {
   let chain = Promise.resolve<void>(undefined)

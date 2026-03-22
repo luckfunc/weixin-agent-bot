@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import { intro, outro, log as clackLog } from '@clack/prompts'
 import { resolveProviderFromEnv, promptProvider } from './auth/prompt.js'
 import { runWeixinBot } from './bot/weixin-runner.js'
-import type { ResolvedProvider } from './providers/types.js'
+import type { ResolvedProvider } from '#types'
 
 const require = createRequire(import.meta.url)
 const pkg = require('../package.json') as { version: string }

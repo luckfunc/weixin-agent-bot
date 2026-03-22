@@ -2,7 +2,7 @@ import chalk from 'chalk'
 import { cancel, isCancel, log, note, select, spinner, text } from '@clack/prompts'
 import { getAllProviders, getProvider } from '../providers/registry.js'
 import { fetchModels } from '../providers/fetch-models.js'
-import type { ProviderDef, ResolvedProvider } from '../providers/types.js'
+import type { PromptModelAuth, ProviderDef, ResolvedProvider } from '#types'
 import { getActiveProfile, setActiveProvider, type AuthProfile } from './store.js'
 import { ensureCodexAuth } from './codex/oauth-flow.js'
 import { loadCodexAuth } from './codex/store.js'
@@ -242,11 +242,6 @@ async function handleApiKey(def: ProviderDef): Promise<ResolvedProvider> {
   const model = await promptModel(def, { apiKey, baseUrl })
   setActiveProvider(def.id, { provider: def.id, apiKey, baseUrl, model })
   return { id: def.id, label: def.label, apiKey, baseUrl, model }
-}
-
-interface PromptModelAuth {
-  apiKey?: string
-  baseUrl?: string
 }
 
 async function promptModel(def: ProviderDef, auth: PromptModelAuth): Promise<string> {

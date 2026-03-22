@@ -9,6 +9,11 @@
     "sourceMap": true,
     "outDir": "dist",
     "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "#types": ["./src/types/index.ts"],
+      "#types/*": ["./src/types/*.ts"]
+    },
     "esModuleInterop": true
   },
   "include": ["src/**/*.ts"]
