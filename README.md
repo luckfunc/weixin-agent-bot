@@ -1,11 +1,45 @@
 # weixin-agent-bot
 
-WeChat iLink + LLM scaffold. Run `npx weixin-agent-bot` after `npm run build` (or `npm run dev` during development).
+WeChat **iLink** + **LLM** CLI: pick **OpenAI API** or **ChatGPT / Codex (OAuth)**, scan QR to bind WeChat, then auto-reply with the model.
+
+**License:** MIT
+
+## Quick start (community)
+
+Requires **Node.js ≥ 22**.
+
+```bash
+# Run the latest release without cloning (downloads on first run)
+npx weixin-agent-bot@latest
+```
+
+Then follow the prompts. Optional: create a `.env` in the current directory (see `.env.example` in the repo) so the CLI can skip questions — copy from [`.env.example`](https://github.com/luckfunc/weixin-agent-bot/blob/main/.env.example).
+
+**Flags:** `--help`, `--version`, `--force-login` (WeChat QR again), `--recodex` (Codex OAuth again).
+
+## Develop from source
+
+```bash
+git clone https://github.com/luckfunc/weixin-agent-bot.git
+cd weixin-agent-bot
+npm install
+npm run dev
+# or: npm run build && node dist/cli.js
+```
+
+## Publish to npm (maintainers)
+
+1. [Create an npm account](https://www.npmjs.com/signup) and log in: `npm login`
+2. Bump version: `npm version patch` (or `minor` / `major`)
+3. Build and publish: `npm publish`
+4. Users can then run: `npx weixin-agent-bot@latest`
+
+Scoped packages (`@scope/name`) need `npm publish --access public` once.
 
 ## WeChat SDK
 
-Uses [`@pinixai/weixin-bot`](https://www.npmjs.com/package/@pinixai/weixin-bot) (published from the same sources as **[epiral/weixin-bot](https://github.com/epiral/weixin-bot)**). `postinstall` builds the package because the npm tarball ships TypeScript only.
+Uses [`@pinixai/weixin-bot`](https://www.npmjs.com/package/@pinixai/weixin-bot) (sources: **[epiral/weixin-bot](https://github.com/epiral/weixin-bot)**). `postinstall` runs a local build of that package because the npm tarball ships TypeScript only.
 
 ## Thanks
 
-The WeChat transport layer comes from **[weixin-bot](https://github.com/epiral/weixin-bot)** by **[@epiral](https://github.com/epiral)** — thank you for the excellent Node.js SDK and protocol work.
+**[weixin-bot](https://github.com/epiral/weixin-bot)** by [@epiral](https://github.com/epiral) — thank you for the Node.js SDK and protocol work.

@@ -1,8 +1,28 @@
 {
   "name": "weixin-agent-bot",
-  "version": "0.1.0",
-  "description": "WeChat GPT Bot scaffold — connect any LLM to WeChat in minutes",
+  "version": "0.1.1",
+  "description": "WeChat iLink + LLM CLI — connect OpenAI or Codex to WeChat in minutes",
   "license": "MIT",
+  "author": "luckfunc",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/luckfunc/weixin-agent-bot.git"
+  },
+  "bugs": {
+    "url": "https://github.com/luckfunc/weixin-agent-bot/issues"
+  },
+  "homepage": "https://github.com/luckfunc/weixin-agent-bot#readme",
+  "keywords": [
+    "wechat",
+    "weixin",
+    "ilink",
+    "gpt",
+    "openai",
+    "codex",
+    "cli",
+    "bot",
+    "llm"
+  ],
   "type": "module",
   "bin": {
     "weixin-agent-bot": "dist/cli.js"
@@ -19,6 +39,7 @@
   },
   "scripts": {
     "postinstall": "node scripts/postinstall-weixin-bot.mjs",
+    "lint": "tsc --noEmit",
     "build": "tsc",
     "dev": "tsx src/cli.ts",
     "prepublishOnly": "npm run build"
