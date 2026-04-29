@@ -1,7 +1,10 @@
-import { existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
 import type { AuthProfile, AuthStore } from '@/types/index.js'
+import {
+  InvalidConfigFileError,
+  readOptionalJsonFile,
+} from './lib/json-file.js'
 import { writeSecretJson } from './lib/secret-file.js'
 
 const defaultDir = path.join(homedir(), '.weixin-agent-bot')
@@ -13,12 +16,12 @@ function storePath(): string {
 
 export function loadAuthStore(): AuthStore {
   const p = storePath()
-  if (!existsSync(p)) return { version: 1, profiles: {} }
-  try {
-    return JSON.parse(readFileSync(p, 'utf-8')) as AuthStore
-  } catch {
-    return { version: 1, profiles: {} }
-  }
+  return (
+    readOptionalJsonFile<AuthStore>(p, 'Saved auth store') ?? {
+      version: 1,
+      profiles: {},
+    }
+  )
 }
 
 export function saveAuthStore(store: AuthStore): void {
@@ -33,7 +36,16 @@ export function getActiveProfile(): AuthProfile | undefined {
 }
 
 export function setActiveAuth(profile: AuthProfile): void {
-  const store = loadAuthStore()
+  let store: AuthStore
+  try {
+    store = loadAuthStore()
+  } catch (error) {
+    if (!(error instanceof InvalidConfigFileError)) {
+      throw error
+    }
+    console.warn(`${error.message} Overwriting it with a new auth store.`)
+    store = { version: 1, profiles: {} }
+  }
   store.activeProvider = profile.provider
   store.profiles[profile.provider] = profile
   saveAuthStore(store)

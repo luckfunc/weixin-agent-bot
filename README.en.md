@@ -2,9 +2,9 @@
 
 [简体中文](README.md)
 
-WeChat **iLink** + **GPT** CLI: use an **OpenAI API key** *or* **ChatGPT / Codex browser OAuth** (same style as before). Scan QR to bind WeChat, then auto-reply with your chosen model (multi-turn per user).
+WeChat **iLink** + **DeepSeek** CLI: connects to the DeepSeek API through the **Vercel AI SDK**. Scan QR to bind WeChat, then auto-reply with your chosen model and keep multi-turn context per WeChat user.
 
-**No OpenClaw deployment:** this runs as a normal **Node CLI** on your machine (or any server with Node). You **do not** need to set up or host WeChat **OpenClaw** — configure `OPENAI_API_KEY` and/or `PROVIDER=codex` via `.env` or prompts.
+**No OpenClaw deployment:** this runs as a normal **Node CLI** on your machine (or any server with Node). You **do not** need to set up or host WeChat **OpenClaw** — configure `DEEPSEEK_API_KEY` via `.env` or prompts.
 
 **License:** MIT
 
@@ -56,17 +56,21 @@ npx -y weixin-agent-bot@latest --version
 npx -y weixin-agent-bot@latest --force-login
 ```
 
-**`--reauth`** — pick sign-in method again (API key vs browser OAuth) and re-authenticate:
+**`--reauth`** — enter DeepSeek API key / model settings again:
 
 ```bash
 npx -y weixin-agent-bot@latest --reauth
 ```
 
-You can combine flags, e.g. fresh WeChat login and OpenAI re-auth:
+You can combine flags, e.g. fresh WeChat login and DeepSeek re-auth:
 
 ```bash
 npx -y weixin-agent-bot@latest --force-login --reauth
 ```
+
+### WeChat chat commands
+
+Send **`/new`** in WeChat to clear your current per-user context and start a new chat.
 
 ## Develop from source
 

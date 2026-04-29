@@ -2,9 +2,9 @@
 
 [English](README.en.md)
 
-微信 **iLink** + **GPT** 命令行工具：可用 **OpenAI API Key**，或 **ChatGPT / Codex 浏览器登录（OAuth，与以前一样）**；扫码绑定微信后按所选模型自动回复（支持多轮对话）。
+微信 **iLink** + **DeepSeek** 命令行工具：通过 **Vercel AI SDK** 接入 DeepSeek API；扫码绑定微信后按所选模型自动回复（按微信用户保留连续上下文）。
 
-**无需部署 OpenClaw：** 本项目是普通的 **Node 命令行**，在你本机或任意有 Node 的环境即可运行，**不必**单独搭建、托管微信 **OpenClaw** 智能体运行时；装好依赖、扫码登录，再按提示或 `.env` 配置 `OPENAI_API_KEY` / `PROVIDER=codex` 等即可。
+**无需部署 OpenClaw：** 本项目是普通的 **Node 命令行**，在你本机或任意有 Node 的环境即可运行，**不必**单独搭建、托管微信 **OpenClaw** 智能体运行时；装好依赖、扫码登录，再按提示或 `.env` 配置 `DEEPSEEK_API_KEY` 即可。
 
 **许可证：** MIT
 
@@ -56,7 +56,7 @@ npx -y weixin-agent-bot@latest --version
 npx -y weixin-agent-bot@latest --force-login
 ```
 
-**`--reauth`** — 重新选择登录方式（API Key 或浏览器 OAuth）并重新鉴权：
+**`--reauth`** — 重新输入 DeepSeek API Key / 模型设置：
 
 ```bash
 npx -y weixin-agent-bot@latest --reauth
@@ -67,6 +67,10 @@ npx -y weixin-agent-bot@latest --reauth
 ```bash
 npx -y weixin-agent-bot@latest --force-login --reauth
 ```
+
+### 微信聊天命令
+
+在微信里发送 **`/new`** 会清空你当前用户的上下文，并开启一段新的对话。
 
 ## 从源码开发
 
