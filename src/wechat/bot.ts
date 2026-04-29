@@ -3,12 +3,17 @@ import { type IncomingMessage, WeixinBot } from '@pinixai/weixin-bot'
 import chalk from 'chalk'
 import qrterm from 'qrcode-terminal'
 import type { WeixinBotOptions } from '@/types/index.js'
-import { replyWithDeepSeekChat } from '../llm/index.js'
+import { replyWithDeepSeekChat, resetDeepSeekChat } from '../llm/index.js'
 
 export type { WeixinBotOptions } from '@/types/index.js'
 
 function ts(level: string, msg: string) {
   console.log(`${new Date().toISOString()} [${level}] ${msg}`)
+}
+
+function isNewChatCommand(text: string): boolean {
+  const command = text.trim().toLowerCase()
+  return command === '/new' || command === '／new'
 }
 
 export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
@@ -86,6 +91,26 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
     const preview =
       msg.text.length > 200 ? `${msg.text.slice(0, 200)}...` : msg.text
     ts('RECV', `${msg.userId}: ${preview}`)
+
+    if (isNewChatCommand(msg.text)) {
+      try {
+        await resetDeepSeekChat(msg.userId)
+        await bot.reply(msg, '已开启新的对话。')
+        ts('SEND', 'Started a new chat')
+      } catch (err) {
+        const message = err instanceof Error ? err.message : String(err)
+        ts('ERROR', message)
+        try {
+          await bot.reply(msg, `Command error: ${message}`)
+        } catch (replyErr) {
+          ts(
+            'ERROR',
+            replyErr instanceof Error ? replyErr.message : String(replyErr),
+          )
+        }
+      }
+      return
+    }
 
     try {
       await bot.sendTyping(msg.userId)

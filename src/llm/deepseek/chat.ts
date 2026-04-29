@@ -85,3 +85,10 @@ export async function replyWithDeepSeekChat(
     return reply
   })
 }
+
+export async function resetDeepSeekChat(conversationId: string): Promise<void> {
+  const run = getConversationRunner(conversationId)
+  await run(async () => {
+    histories.delete(conversationId)
+  })
+}

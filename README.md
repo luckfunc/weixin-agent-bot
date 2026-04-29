@@ -68,6 +68,10 @@ npx -y weixin-agent-bot@latest --reauth
 npx -y weixin-agent-bot@latest --force-login --reauth
 ```
 
+### 微信聊天命令
+
+在微信里发送 **`/new`** 会清空你当前用户的上下文，并开启一段新的对话。
+
 ## 从源码开发
 
 ```bash

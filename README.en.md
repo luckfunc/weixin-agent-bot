@@ -68,6 +68,10 @@ You can combine flags, e.g. fresh WeChat login and DeepSeek re-auth:
 npx -y weixin-agent-bot@latest --force-login --reauth
 ```
 
+### WeChat chat commands
+
+Send **`/new`** in WeChat to clear your current per-user context and start a new chat.
+
 ## Develop from source
 
 ```bash
