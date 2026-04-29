@@ -16,7 +16,7 @@ export async function runWeixinBot(opts: WeixinBotOptions): Promise<void> {
   const systemPrompt =
     process.env.SYSTEM_PROMPT ??
     'You are a helpful assistant. Reply concisely in the same language as the user.'
-  const tokenPath = process.env.WEIXIN_TOKEN_PATH
+  const tokenPath = process.env.WEIXIN_TOKEN_PATH?.trim() || undefined
 
   const loginSpinner = spinner()
   loginSpinner.start(
