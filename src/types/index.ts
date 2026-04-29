@@ -1,8 +1,6 @@
 export type {
   AuthProfile,
   AuthStore,
-  CodexAuthFile,
-  CodexAuthProfile,
-  OpenAiAuthProfile,
+  DeepSeekAuthProfile,
 } from './auth.js'
 export type { LlmRuntime, WeixinBotOptions } from './bot.js'

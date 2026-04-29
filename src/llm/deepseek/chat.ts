@@ -1,7 +1,10 @@
-import OpenAI from 'openai'
-import type { ChatCompletionMessageParam } from 'openai/resources/chat/completions.js'
+import {
+  createDeepSeek,
+  type DeepSeekLanguageModelOptions,
+} from '@ai-sdk/deepseek'
+import { generateText, type ModelMessage } from 'ai'
 import { createSerialTaskRunner } from '../../lib/serial-task.js'
-import type { OpenAiConfig } from './types.js'
+import type { DeepSeekConfig } from './types.js'
 
 function maxChatMessages(): number {
   const raw = process.env.CHAT_MAX_MESSAGES
@@ -21,7 +24,7 @@ const conversationRunners = new Map<
   ReturnType<typeof createSerialTaskRunner>
 >()
 
-const histories = new Map<string, ChatCompletionMessageParam[]>()
+const histories = new Map<string, ModelMessage[]>()
 
 function getConversationRunner(conversationId: string) {
   let runner = conversationRunners.get(conversationId)
@@ -32,8 +35,19 @@ function getConversationRunner(conversationId: string) {
   return runner
 }
 
-export async function replyWithOpenAiChat(
-  config: OpenAiConfig,
+function providerOptionsFor(
+  config: DeepSeekConfig,
+): { deepseek: DeepSeekLanguageModelOptions } | undefined {
+  if (!config.thinking) return undefined
+  return {
+    deepseek: {
+      thinking: { type: config.thinking },
+    },
+  }
+}
+
+export async function replyWithDeepSeekChat(
+  config: DeepSeekConfig,
   opts: {
     conversationId: string
     systemPrompt: string
@@ -42,38 +56,29 @@ export async function replyWithOpenAiChat(
 ): Promise<string> {
   const run = getConversationRunner(opts.conversationId)
   return run(async () => {
-    const client = new OpenAI({
+    const provider = createDeepSeek({
       apiKey: config.apiKey,
       baseURL: config.baseUrl,
     })
     const history = histories.get(opts.conversationId) ?? []
-    const userMessage: ChatCompletionMessageParam = {
+    const userMessage: ModelMessage = {
       role: 'user',
       content: opts.userText,
     }
-    const completion = await client.chat.completions.create({
-      model: config.model,
-      messages: [
-        { role: 'system', content: opts.systemPrompt },
-        ...history,
-        userMessage,
-      ],
-    })
-    const m = completion.choices[0]?.message
-    const replyParts: string[] = []
-    if (m?.content?.trim()) replyParts.push(m.content.trim())
-    if (m?.refusal?.trim()) replyParts.push(m.refusal.trim())
-    const reply = replyParts.join('\n').trim()
 
-    const assistantMessage: ChatCompletionMessageParam = {
+    const result = await generateText({
+      model: provider(config.model),
+      system: opts.systemPrompt,
+      messages: [...history, userMessage],
+      providerOptions: providerOptionsFor(config),
+    })
+    const reply = result.text.trim()
+
+    const assistantMessage: ModelMessage = {
       role: 'assistant',
-      content: reply.length > 0 ? reply : null,
+      content: reply,
     }
-    const next: ChatCompletionMessageParam[] = [
-      ...history,
-      userMessage,
-      assistantMessage,
-    ]
+    const next: ModelMessage[] = [...history, userMessage, assistantMessage]
     trimHistory(next, maxChatMessages())
     histories.set(opts.conversationId, next)
 

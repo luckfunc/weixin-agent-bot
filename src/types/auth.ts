@@ -1,32 +1,18 @@
-/** Persisted OpenAI API credentials (see persistence/auth-store). */
-export interface OpenAiAuthProfile {
-  provider: 'openai'
+import type { DeepSeekThinkingMode } from '../llm/deepseek/types.js'
+
+/** Persisted DeepSeek API credentials. */
+export interface DeepSeekAuthProfile {
+  provider: 'deepseek'
   apiKey?: string
   baseUrl?: string
   model?: string
+  thinking?: DeepSeekThinkingMode
 }
 
-/** Last-selected Codex model; OAuth tokens live in codex-auth.json. */
-export interface CodexAuthProfile {
-  provider: 'codex'
-  model?: string
-}
-
-export type AuthProfile = OpenAiAuthProfile | CodexAuthProfile
+export type AuthProfile = DeepSeekAuthProfile
 
 export interface AuthStore {
   version: number
   activeProvider?: string
   profiles: Record<string, AuthProfile>
-}
-
-/** Shape stored in `codex-auth.json` for @mariozechner/pi-ai OAuth. */
-export interface CodexAuthFile {
-  'openai-codex': {
-    type: 'oauth'
-    access: string
-    refresh: string
-    expires: number
-    [key: string]: unknown
-  }
 }

@@ -1,7 +1,7 @@
 {
   "name": "weixin-agent-bot",
-  "version": "0.3.0",
-  "description": "WeChat iLink + GPT CLI — OpenAI API key or ChatGPT/Codex OAuth",
+  "version": "0.4.0",
+  "description": "WeChat iLink + DeepSeek CLI with AI SDK conversation context",
   "license": "MIT",
   "author": "luckfunc",
   "repository": {
@@ -16,9 +16,8 @@
     "wechat",
     "weixin",
     "ilink",
-    "gpt",
-    "openai",
-    "codex",
+    "deepseek",
+    "ai-sdk",
     "cli",
     "bot",
     "llm"
@@ -43,17 +42,17 @@
     "check:biome": "biome check .",
     "format": "biome check --write .",
     "test": "tsx --test test/**/*.test.ts",
-    "build": "tsc && tsc-alias -p tsconfig.json",
+    "build": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\" && tsc && tsc-alias -p tsconfig.json",
     "dev": "tsx src/cli.ts",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
+    "@ai-sdk/deepseek": "^2.0.30",
     "@clack/prompts": "^0.11.0",
-    "@mariozechner/pi-ai": "^0.61.1",
     "@pinixai/weixin-bot": "^1.2.0",
+    "ai": "^6.0.170",
     "chalk": "^5.6.2",
     "dotenv": "^16.4.5",
-    "openai": "^4.73.0",
     "qrcode-terminal": "^0.12.0"
   },
   "devDependencies": {

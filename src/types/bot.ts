@@ -1,9 +1,7 @@
-import type { OpenAiConfig } from '../llm/openai/types.js'
+import type { DeepSeekConfig } from '../llm/deepseek/types.js'
 
-/** How the bot talks to GPT: official API key or ChatGPT/Codex browser OAuth. */
-export type LlmRuntime =
-  | { kind: 'openai-api'; config: OpenAiConfig }
-  | { kind: 'codex'; model: string }
+/** How the bot talks to DeepSeek through the AI SDK. */
+export type LlmRuntime = { kind: 'deepseek'; config: DeepSeekConfig }
 
 export interface WeixinBotOptions {
   llm: LlmRuntime
